@@ -1,341 +1,643 @@
 # Sistema de Bilheteria de Teatro
 
-## Verificação, Validação e Teste de Software
+## Visão geral
 
-**Instituição:** IFSP Câmpus São Carlos
+Este projeto implementa um sistema de bilheteria para teatro, responsável pelo gerenciamento de sessões e pela venda e cancelamento de ingressos.
 
-**Disciplina:** Verificação, Validação e Teste de Software
+O domínio foi mantido propositalmente pequeno, com foco em regras de negócio relacionadas à capacidade das sessões e ao controle dos ingressos vendidos.
 
-**Professor:** Dr. Lucas Oliveira
+Uma peça teatral pode possuir diversas sessões, cada uma ocorrendo em uma data e horário específicos. Cada sessão possui uma capacidade máxima e controla os ingressos associados a ela.
 
-**Grupo:** Igor, Yasmim, Filippa
+A principal regra do domínio é:
 
+> Uma sessão não pode possuir mais ingressos vendidos do que sua capacidade.
 
----
-
-## 1. Descrição do Projeto
-
-O projeto consiste no desenvolvimento de um **Sistema de Bilheteria de Teatro**, com foco na aplicação de conceitos de Verificação, Validação e Teste de Software.
-
-O sistema tem como objetivo permitir o cadastro de sessões de teatro, emissão e controle de ingressos, confirmação de presença e geração de relatórios de ocupação.
-
-As regras de negócio relacionadas à meia-entrada, capacidade da sessão e distanciamento entre assentos são implementadas e validadas no domínio da aplicação.
+Além disso, o sistema controla regras relacionadas à validade das sessões, tipos de ingresso, descontos e cancelamentos.
 
 ---
 
-## 2. Agregado DDD
+# Modelo de domínio
 
-O sistema utiliza o conceito de **Aggregate** do Domain-Driven Design (DDD).
+O domínio principal é composto pelas seguintes estruturas:
 
-### Aggregate Root
+* `Sessao`
+* `Ingresso`
+* `Peca`
+* `DataHoraSessao`
+* `TipoIngresso`
 
-#### Sessao
-
-A classe `Sessao` representa a sessão de teatro e é a **Aggregate Root** do sistema.
-
-Ela é responsável por manter as regras de consistência da sessão, incluindo:
-
-* Data e horário;
-* Capacidade total;
-* Assentos disponíveis e ocupados;
-* Cota de meia-entrada;
-* Regra de distanciamento entre assentos;
-* Controle dos ingressos emitidos.
-
-### Entity
-
-#### IngressoEmitido
-
-Representa um ingresso emitido dentro de uma sessão.
-
-Possui identidade própria e pode assumir os seguintes estados:
-
-* `EMITIDO`
-* `CONFIRMADO`
-* `CANCELADO`
-
-O `IngressoEmitido` só pode ser acessado através da `Sessao`.
-
-### Value Objects
-
-#### Assento
-
-Representa um assento do teatro.
-
-É composto por:
-
-* Fileira;
-* Número.
-
-O objeto é imutável.
-
-#### CategoriaPreco
-
-Representa a categoria de preço do ingresso.
-
-Possui:
-
-* Tipo:
-
-  * Inteira;
-  * Meia;
-  * Idoso;
-  * PCD.
-* Valor.
-
-### Repository
-
-#### SessaoRepository
-
-É o único ponto de acesso à agregação `Sessao`.
-
-O repositório é responsável pelo armazenamento e recuperação das sessões.
+A entidade `Sessao` representa o Aggregate Root do módulo de bilheteria.
 
 ---
 
-## 3. Invariantes do Domínio
+# Aggregate Root
 
-A `Sessao` deve garantir que as seguintes regras sejam sempre respeitadas:
+## Sessao
 
-### Cota de meia-entrada
+A `Sessao` é o Aggregate Root do domínio.
 
-A quantidade de ingressos de meia-entrada emitidos não pode ultrapassar **40% da capacidade total da sessão**.
+Ela representa uma apresentação específica de uma peça em determinada data e horário.
+
+Exemplo:
 
 ```text
-Ingressos de meia-entrada <= 40% da capacidade total
+Peça: O Rei Leão
+
+Sessão — 20/09/2026 19:00
+├── Ingresso 001 — INTEIRA
+├── Ingresso 002 — ESTUDANTE
+└── Ingresso 003 — INTEIRA
 ```
 
-### Distanciamento
+Toda operação relacionada aos ingressos de uma sessão deve ser controlada pela própria `Sessao`.
 
-Quando o modo de distanciamento estiver ativo, nenhum assento adjacente a um assento ocupado pode ser vendido.
+Isso garante que as regras de negócio relacionadas à capacidade e à disponibilidade não sejam violadas.
 
-### Capacidade
-
-A quantidade de ingressos emitidos nunca pode ultrapassar a capacidade total da sessão.
+Uma possível estrutura é:
 
 ```text
-Ocupação <= 100% da capacidade
+Sessao
+--------------------------------
+id
+peca
+dataHora
+capacidade
+valorBaseIngresso
+ingressos
+status
+--------------------------------
+comprarIngresso()
+cancelarIngresso()
+estaLotada()
+quantidadeIngressosDisponiveis()
 ```
 
----
+### Responsabilidades da Sessao
 
-# 4. Application Services
+A `Sessao` é responsável por:
 
-O sistema possui um Application Service para cada User Story:
-
-1. `CadastrarSessaoService`
-2. `EmitirIngressoService`
-3. `ConfirmarPresencaService`
-4. `RelatorioOcupacaoService`
-
----
-
-# 5. User Stories e Cenários BDD
-
-## US01 — Cadastrar sessão de teatro
-
-**Como** funcionário da bilheteria,
-**eu quero** cadastrar uma sessão de teatro com a configuração de cotas (meia-entrada, idoso, PCD),
-**para que** a venda de ingressos respeite os limites legais e de distanciamento desde o início.
-
-### Scenario 1.1 — Cadastro válido
-
-**Dado que** informo data, horário, capacidade total e ativo o modo de distanciamento,
-**quando** cadastro a sessão,
-**então** a sessão é criada com status disponível e cota de meia-entrada calculada em 40% da capacidade.
-
-### Scenario 1.2 — Capacidade inválida
-
-**Dado que** informo uma capacidade total menor ou igual a zero,
-**quando** tento cadastrar a sessão,
-**então** o cadastro é rejeitado e nenhuma sessão é criada.
-
-### Scenario 1.3 — Data no passado
-
-**Dado que** informo uma data anterior à data atual,
-**quando** tento cadastrar a sessão,
-**então** o cadastro é rejeitado.
+* controlar seus ingressos;
+* impedir vendas acima da capacidade;
+* calcular a quantidade de vagas disponíveis;
+* identificar quando está lotada;
+* impedir vendas em sessões encerradas;
+* permitir o cancelamento de ingressos;
+* liberar novamente uma vaga quando um ingresso é cancelado;
+* manter a consistência entre capacidade e quantidade de ingressos vendidos.
 
 ---
 
-## US02 — Emitir ingressos
+# Entidades
 
-**Como** funcionário da bilheteria,
-**eu quero** emitir ingressos para os clientes em diferentes quantidades e tipos,
-**para que** a venda ocorra sem violar as cotas de meia-entrada nem as regras de distanciamento.
+## Ingresso
 
-### Scenario 2.1 — Emissão dentro da cota
+O `Ingresso` é uma entidade interna ao agregado `Sessao`.
 
-**Dado que** a sessão tem menos de 40% dos ingressos emitidos como meia-entrada,
-**quando** emito um novo ingresso meia-entrada para um assento livre,
-**então** o ingresso é emitido com status `EMITIDO`.
-
-### Scenario 2.2 — Limite de 40% atingido
-
-**Dado que** a sessão já emitiu exatamente 40% de ingressos meia-entrada,
-**quando** solicito a emissão de mais um ingresso meia-entrada,
-**então** a operação é rejeitada.
-
-### Scenario 2.3 — Ocupação em 100%
-
-**Dado que** todos os assentos da sessão já estão ocupados,
-**quando** solicito a emissão de um novo ingresso,
-**então** a operação é rejeitada por capacidade esgotada.
-
-### Scenario 2.4 — Bloqueio por distanciamento
-
-**Dado que** o modo de distanciamento está ativo e o assento adjacente já está ocupado,
-**quando** tento emitir um ingresso para esse assento,
-**então** a operação é rejeitada.
-
-### Scenario 2.5 — Emissão em lote
-
-**Dado que** solicito a emissão de 3 ingressos inteiros e 1 meia-entrada em uma única operação, todos dentro dos limites,
-**quando** confirmo a emissão,
-**então** os 4 ingressos são emitidos com status `EMITIDO`.
-
----
-
-## US03 — Confirmar presença/uso do ingresso
-
-**Como** funcionário da bilheteria,
-**eu quero** confirmar a presença do cliente na entrada da sessão,
-**para que** o controle de uso dos ingressos fique registrado.
-
-### Scenario 3.1 — Confirmação válida
-
-**Dado que** um ingresso está com status `EMITIDO`,
-**quando** confirmo a presença do cliente,
-**então** o status do ingresso muda para `CONFIRMADO`.
-
-### Scenario 3.2 — Ingresso já cancelado
-
-**Dado que** um ingresso está com status `CANCELADO`,
-**quando** tento confirmar a presença,
-**então** a operação é rejeitada.
-
-### Scenario 3.3 — Confirmação duplicada
-
-**Dado que** um ingresso já está com status `CONFIRMADO`,
-**quando** tento confirmar a presença novamente,
-**então** a operação é rejeitada.
-
----
-
-## US04 — Relatório de ocupação
-
-**Como** gestor do teatro,
-**eu quero** visualizar um relatório de ocupação filtrado por data, horário e tipo de ingresso,
-**para que** eu possa acompanhar o faturamento e a taxa de ocupação das sessões.
-
-### Scenario 4.1 — Relatório com filtros aplicados
-
-**Dado que** existem sessões cadastradas em diferentes datas e horários,
-**quando** solicito o relatório filtrando por uma data específica e tipo `meia-entrada`,
-**então** o relatório retorna apenas os ingressos que atendem aos filtros, com faturamento e taxa de ocupação calculados.
-
-### Scenario 4.2 — Nenhum resultado encontrado
-
-**Dado que** não existem ingressos emitidos que atendam aos filtros informados,
-**quando** solicito o relatório,
-**então** o relatório retorna faturamento zero e taxa de ocupação zero.
-
-### Scenario 4.3 — Relatório sem filtros
-
-**Dado que** não informo nenhum filtro,
-**quando** solicito o relatório,
-**então** o relatório retorna os dados agregados de todas as sessões.
-
----
-
-# 6. Estrutura de Services
-
-| Service                    | Responsabilidade                                | User Story |
-| -------------------------- | ----------------------------------------------- | ---------- |
-| `CadastrarSessaoService`   | Cadastro e validação de novas sessões           | US01       |
-| `EmitirIngressoService`    | Emissão individual ou em lote de ingressos      | US02       |
-| `ConfirmarPresencaService` | Confirmação do uso dos ingressos                | US03       |
-| `RelatorioOcupacaoService` | Geração de relatórios de ocupação e faturamento | US04       |
-
----
-
-# 7. Fluxo Geral do Sistema
+Cada ingresso pertence a exatamente **uma sessão**.
 
 ```text
-                    +----------------------+
-                    |  Cadastrar Sessão    |
-                    +----------+-----------+
-                               |
-                               v
-                    +----------------------+
-                    |       Sessao         |
-                    |   Aggregate Root     |
-                    +----------+-----------+
-                               |
-              +----------------+----------------+
-              |                |                |
-              v                v                v
-       Emitir Ingresso  Confirmar Presença  Relatório
-              |                |                |
-              v                v                v
-        IngressoEmitido   Alterar Estado    Ocupação /
-              |                              Faturamento
-              v
-       Regras de Domínio
-       - Cota 40%
-       - Capacidade
-       - Distanciamento
+Ingresso
+--------------------------------
+id
+tipoIngresso
+valor
+status
+--------------------------------
+cancelar()
+```
+
+Exemplo:
+
+```text
+Ingresso
+├── id: 123
+├── tipo: ESTUDANTE
+├── valor: R$ 25,00
+└── status: VENDIDO
+```
+
+O ingresso não deve ser manipulado de forma independente da sessão.
+
+Sua criação ocorre durante uma operação de compra realizada pela `Sessao`.
+
+Da mesma forma, ao cancelar um ingresso, sua sessão correspondente pode ser obtida diretamente pela associação existente entre os objetos.
+
+### Status do ingresso
+
+Os principais estados considerados são:
+
+```text
+VENDIDO
+CANCELADO
+```
+
+Um ingresso cancelado deixa de ocupar uma vaga da sessão.
+
+---
+
+## Peca
+
+A `Peca` representa uma obra teatral.
+
+Ela é uma entidade própria e não faz parte do agregado `Sessao`.
+
+```text
+Peca
+--------------------------------
+id
+titulo
+descricao
+duracao
+classificacao
+--------------------------------
+adicionarSessao()
+```
+
+Uma peça pode possuir diversas sessões:
+
+```text
+Peça
+├── Sessão — 19/09/2026 19:00
+├── Sessão — 20/09/2026 16:00
+└── Sessão — 20/09/2026 20:00
+```
+
+A `Sessao` mantém apenas uma referência para a peça à qual pertence.
+
+Exemplo:
+
+```text
+Sessao
+└── pecaId
+```
+
+Essa separação evita a criação de um agregado muito grande e mantém os limites do domínio bem definidos.
+
+---
+
+# Value Objects
+
+## DataHoraSessao
+
+`DataHoraSessao` representa a data e os horários relacionados à realização da sessão.
+
+```text
+DataHoraSessao
+--------------------------------
+data
+horaInicio
+horaFim
+--------------------------------
+validar()
+```
+
+Esse Value Object é responsável por impedir a existência de datas e horários inválidos.
+
+Entre suas regras estão:
+
+* uma sessão deve possuir data e horário;
+* uma sessão não pode ser criada em uma data e horário já passados;
+* a data e o horário devem representar valores válidos;
+* ao atualizar uma sessão, a nova data e horário também devem permanecer válidos.
+
+---
+
+## TipoIngresso
+
+`TipoIngresso` representa a categoria do ingresso e sua respectiva regra de desconto.
+
+```text
+TipoIngresso
+--------------------------------
+categoria
+percentualDesconto
+--------------------------------
+ehInteira()
+ehMeiaEntrada()
+calcularValor(valorBase)
+```
+
+Os tipos inicialmente utilizados são:
+
+| Tipo      | Desconto |
+| --------- | -------: |
+| INTEIRA   |       0% |
+| ESTUDANTE |      50% |
+| PCD       |      60% |
+| IDOSO     |      65% |
+
+Exemplo:
+
+```text
+TipoIngresso("INTEIRA")
+TipoIngresso("ESTUDANTE")
+TipoIngresso("PCD")
+TipoIngresso("IDOSO")
+```
+
+O próprio Value Object deve garantir que apenas tipos válidos sejam utilizados.
+
+Ao realizar uma compra, o valor final do ingresso é calculado a partir do valor base definido para a sessão.
+
+Exemplo:
+
+```text
+valorBase = R$ 50,00
+
+INTEIRA
+R$ 50,00
+
+ESTUDANTE
+R$ 25,00
+
+PCD
+R$ 20,00
+
+IDOSO
+R$ 17,50
 ```
 
 ---
 
-# 8. Estados do Ingresso
+# Repositório
 
-O `IngressoEmitido` possui três estados principais:
+Como `Sessao` é o Aggregate Root, ela possui um repositório responsável por sua persistência.
 
 ```text
-          +---------+
-          | EMITIDO |
-          +----+----+
-               |
-               | confirmação
-               v
-        +-------------+
-        | CONFIRMADO  |
-        +-------------+
-
-          +---------+
-          | EMITIDO |
-          +----+----+
-               |
-               | cancelamento
-               v
-        +-------------+
-        | CANCELADO   |
-        +-------------+
+ISessaoRepository
+        ▲
+        │
+SessaoRepository
 ```
 
-As transições de estado devem respeitar as regras definidas pelo domínio.
+Operações previstas:
 
-Um ingresso `CANCELADO` não pode ser confirmado.
+```text
+buscarPorId(id)
+listar()
+salvar(sessao)
+remover(id)
+```
 
-Um ingresso `CONFIRMADO` não pode ser confirmado novamente.
+O restante do domínio deve acessar as sessões através dessa abstração, evitando dependência direta de uma implementação específica de persistência.
 
 ---
 
-# 9. Critérios de Validação
+# Serviços de aplicação
 
-O sistema deve validar, entre outros, os seguintes pontos:
+Os serviços de aplicação fazem a comunicação entre a camada externa da aplicação e o domínio.
 
-* Capacidade da sessão maior que zero;
-* Data e horário válidos;
-* Data da sessão não pode estar no passado;
-* Limite de 40% para ingressos de meia-entrada;
-* Capacidade máxima da sessão;
-* Disponibilidade do assento;
-* Regras de distanciamento;
-* Estado atual do ingresso;
-* Confirmação de presença somente para ingressos `EMITIDO`;
-* Cálculo correto de faturamento;
-* Cálculo correto da taxa de ocupação;
-* Aplicação correta dos filtros do relatório.
+Inicialmente são previstos:
+
+```text
+CriarSessaoService
+
+ListarSessoesService
+
+BuscarSessaoService
+
+AtualizarSessaoService
+
+RemoverSessaoService
+
+ComprarIngressoService
+
+CancelarIngressoService
+```
+
+Os serviços são responsáveis por coordenar os casos de uso.
+
+As regras de negócio, entretanto, devem permanecer dentro das entidades e Value Objects responsáveis por garanti-las.
+
+Por exemplo:
+
+```text
+ComprarIngressoService
+        │
+        ▼
+     Sessao
+        │
+        ├── verifica capacidade
+        ├── valida o tipo do ingresso
+        ├── calcula o valor
+        ├── cria o ingresso
+        └── registra a venda
+```
+
+O `ComprarIngressoService` coordena a operação, mas quem garante que a capacidade da sessão não será ultrapassada é a própria `Sessao`.
+
+---
+
+# Regras de negócio
+
+## Capacidade da sessão
+
+Toda sessão deve possuir uma capacidade maior que zero.
+
+```text
+capacidade > 0
+```
+
+Portanto:
+
+```text
+capacidade = -1 → inválida
+
+capacidade = 0 → inválida
+
+capacidade = 1 → válida
+```
+
+A capacidade igual a `1` representa a menor capacidade válida possível.
+
+---
+
+## Limite de ingressos
+
+A quantidade de ingressos vendidos nunca pode ultrapassar a capacidade da sessão.
+
+Exemplo:
+
+```text
+Capacidade: 100
+Ingressos vendidos: 100
+```
+
+Nesse estado, a sessão está lotada e nenhuma nova venda pode ser realizada.
+
+```text
+quantidadeVendida <= capacidade
+```
+
+---
+
+## Última vaga disponível
+
+Se uma sessão ainda possuir uma única vaga, a venda é permitida.
+
+Exemplo:
+
+```text
+Capacidade: 100
+Vendidos: 99
+Disponíveis: 1
+```
+
+Após uma nova venda:
+
+```text
+Capacidade: 100
+Vendidos: 100
+Disponíveis: 0
+```
+
+A sessão passa então a ser considerada lotada.
+
+---
+
+## Sessão encerrada
+
+Não é permitido vender ingressos para uma sessão que já tenha sido encerrada.
+
+Antes de realizar a compra, a sessão deve verificar se sua data e horário permitem novas vendas.
+
+---
+
+## Associação entre ingresso e sessão
+
+Cada ingresso pertence a exatamente uma sessão.
+
+```text
+Sessao
+   │
+   └── Ingresso
+```
+
+Um ingresso não pode simultaneamente pertencer a duas sessões diferentes.
+
+Sua sessão de origem é determinada pela própria relação entre as entidades.
+
+---
+
+## Cancelamento de ingresso
+
+Um ingresso vendido pode ser cancelado.
+
+Quando isso ocorre:
+
+```text
+VENDIDO → CANCELADO
+```
+
+O ingresso deixa de ocupar uma vaga da sessão.
+
+Exemplo:
+
+```text
+Capacidade: 100
+Vendidos: 100
+Disponíveis: 0
+```
+
+Após o cancelamento de um ingresso:
+
+```text
+Capacidade: 100
+Vendidos: 99
+Disponíveis: 1
+```
+
+A sessão deixa de estar lotada e volta a permitir a venda de um ingresso.
+
+---
+
+## Cancelamento duplicado
+
+Um ingresso que já possui status `CANCELADO` não pode ser cancelado novamente.
+
+Essa regra evita operações redundantes e alterações incorretas na quantidade de vagas disponíveis.
+
+---
+
+## Alteração da capacidade
+
+A capacidade de uma sessão pode ser alterada desde que permaneça válida.
+
+Ela nunca pode ser:
+
+```text
+<= 0
+```
+
+Além disso, uma sessão que já possui ingressos vendidos não pode ter sua capacidade reduzida para uma quantidade inferior ao número de ingressos atualmente vendidos.
+
+Exemplo:
+
+```text
+Vendidos: 80
+```
+
+São válidas:
+
+```text
+Nova capacidade: 100
+Nova capacidade: 81
+Nova capacidade: 80
+```
+
+É inválida:
+
+```text
+Nova capacidade: 79
+```
+
+Caso contrário, existiriam mais ingressos vendidos do que vagas disponíveis na sessão.
+
+---
+
+## Remoção de sessão
+
+Uma sessão existente pode ser removida quando não possui ingressos vendidos.
+
+Se houver ingressos vendidos associados à sessão, sua remoção deve ser recusada.
+
+Essa regra evita a exclusão de uma sessão que ainda possui vendas registradas.
+
+---
+
+## Peça associada
+
+Toda sessão deve estar associada a uma peça existente.
+
+Portanto, uma sessão não pode ser criada ou atualizada:
+
+* sem uma peça associada;
+* com o identificador de uma peça inexistente.
+
+---
+
+## Tipos de ingresso
+
+O sistema aceita inicialmente somente:
+
+```text
+INTEIRA
+ESTUDANTE
+PCD
+IDOSO
+```
+
+Qualquer outro tipo deve ser considerado inválido.
+
+O tipo também não pode estar ausente durante uma compra.
+
+---
+
+# Cálculo de disponibilidade
+
+A quantidade de ingressos disponíveis pode ser calculada utilizando:
+
+```text
+disponiveis = capacidade - quantidadeIngressosVendidos
+```
+
+Ingressos com status `CANCELADO` não devem ser considerados na quantidade de ingressos vendidos.
+
+Exemplo:
+
+```text
+Capacidade: 50
+
+Ingressos:
+40 VENDIDOS
+3 CANCELADOS
+```
+
+Resultado:
+
+```text
+Ingressos vendidos: 40
+Ingressos disponíveis: 10
+```
+
+---
+
+# Invariantes do agregado
+
+A entidade `Sessao` deve permanecer sempre em um estado válido.
+
+As principais invariantes são:
+
+```text
+capacidade > 0
+```
+
+```text
+quantidadeIngressosVendidos <= capacidade
+```
+
+```text
+Sessao deve possuir uma data e horário válidos
+```
+
+```text
+Sessao deve estar associada a uma Peca existente
+```
+
+```text
+Ingresso pertence a exatamente uma Sessao
+```
+
+```text
+Ingresso cancelado não ocupa vaga
+```
+
+```text
+Sessao encerrada não permite novas vendas
+```
+
+Essas regras devem ser protegidas pelo domínio, independentemente da forma como a aplicação seja utilizada.
+
+---
+
+# Estrutura conceitual
+
+```text
+Peca
+│
+└── Sessao
+      │
+      ├── DataHoraSessao
+      │
+      ├── Capacidade
+      │
+      ├── ValorBaseIngresso
+      │
+      └── Ingressos
+            │
+            ├── TipoIngresso
+            ├── Valor
+            └── Status
+```
+
+Dentro do módulo de bilheteria:
+
+```text
+Sessao
+   │
+   ├── Aggregate Root
+   │
+   └── controla
+          │
+          └── Ingresso
+```
+
+Enquanto:
+
+```text
+DataHoraSessao
+TipoIngresso
+```
+
+são Value Objects utilizados para encapsular regras específicas do domínio.
+Assim, regras como capacidade máxima, disponibilidade, cancelamento e tipos de ingresso permanecem protegidas independentemente da camada que esteja utilizando o sistema.
