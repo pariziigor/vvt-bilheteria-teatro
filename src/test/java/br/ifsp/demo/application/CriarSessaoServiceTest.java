@@ -106,6 +106,17 @@ class CriarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    @DisplayName("[1.8] Rejeita sessão para peça inexistente")
+    void rejeitaPecaInexistente() {
+        UUID pecaId = UUID.randomUUID();
+        when(pecaRepository.existe(pecaId)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.criar(pecaId, dataHoraFutura(), 100, new BigDecimal("50.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
+    }
+
     private DataHoraSessao dataHoraFutura() {
         return new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
     }
