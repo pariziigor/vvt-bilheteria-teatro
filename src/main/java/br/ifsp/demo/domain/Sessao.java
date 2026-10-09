@@ -55,6 +55,13 @@ public class Sessao {
         if (capacidade <= 0) {
             throw new IllegalArgumentException("A capacidade da sessão deve ser positiva");
         }
+        long vendidos = ingressos.stream()
+                .filter(atual -> atual.getStatus() == StatusIngresso.VENDIDO)
+                .count();
+        if (capacidade < vendidos) {
+            throw new IllegalArgumentException(
+                    "A capacidade não pode ser menor que a quantidade de ingressos vendidos");
+        }
         this.pecaId = pecaId;
         this.dataHora = dataHora;
         this.capacidade = capacidade;
