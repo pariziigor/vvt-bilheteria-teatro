@@ -98,6 +98,14 @@ class CriarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    @DisplayName("[1.7] Rejeita sessão sem peça associada")
+    void rejeitaPecaAusente() {
+        assertThatThrownBy(() -> service.criar(null, dataHoraFutura(), 100, new BigDecimal("50.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
+    }
+
     private DataHoraSessao dataHoraFutura() {
         return new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
     }
