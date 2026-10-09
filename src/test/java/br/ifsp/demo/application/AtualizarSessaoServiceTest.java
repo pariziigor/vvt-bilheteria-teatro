@@ -174,6 +174,21 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository).salvar(sessao);
     }
 
+    @Test
+    @DisplayName("[4.11] Rejeita atualização para uma peça inexistente")
+    void rejeitaPecaInexistente() {
+        Sessao sessao = sessaoCadastrada();
+        UUID pecaOriginal = sessao.getPecaId();
+        UUID pecaInexistente = UUID.randomUUID();
+        when(pecaRepository.existe(pecaInexistente)).thenReturn(false);
+
+        assertThatThrownBy(() -> atualizarPeca(sessao, pecaInexistente))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(sessao.getPecaId()).isEqualTo(pecaOriginal);
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00"));
