@@ -71,6 +71,14 @@ class CriarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    @DisplayName("[1.4] Rejeita capacidade negativa")
+    void rejeitaCapacidadeNegativa() {
+        assertThatThrownBy(() -> service.criar(UUID.randomUUID(), dataHoraFutura(), -1, new BigDecimal("50.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
+    }
+
     private DataHoraSessao dataHoraFutura() {
         return new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
     }
