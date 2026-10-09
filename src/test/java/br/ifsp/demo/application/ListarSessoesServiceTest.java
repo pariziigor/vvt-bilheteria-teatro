@@ -48,6 +48,14 @@ class ListarSessoesServiceTest {
         assertThat(service.listar()).containsExactly(sessao);
     }
 
+    @Test
+    @DisplayName("[2.3] Retorna lista vazia quando não há sessões")
+    void retornaListaVaziaSemSessoes() {
+        when(sessaoRepository.listar()).thenReturn(List.of());
+
+        assertThat(service.listar()).isEmpty();
+    }
+
     private Sessao sessao(UUID pecaId) {
         DataHoraSessao dataHora = new DataHoraSessao(
                 LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
