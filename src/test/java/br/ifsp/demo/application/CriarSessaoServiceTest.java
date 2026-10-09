@@ -63,6 +63,14 @@ class CriarSessaoServiceTest {
         verify(sessaoRepository).salvar(sessao);
     }
 
+    @Test
+    @DisplayName("[1.3] Rejeita capacidade igual a zero")
+    void rejeitaCapacidadeIgualAZero() {
+        assertThatThrownBy(() -> service.criar(UUID.randomUUID(), dataHoraFutura(), 0, new BigDecimal("50.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
+    }
+
     private DataHoraSessao dataHoraFutura() {
         return new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
     }
