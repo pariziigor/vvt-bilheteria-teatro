@@ -111,6 +111,19 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository).salvar(sessao);
     }
 
+    @Test
+    @DisplayName("[4.6] Rejeita capacidade menor que a quantidade de ingressos vendidos")
+    void rejeitaCapacidadeMenorQueIngressosVendidos() {
+        Sessao sessao = sessaoCadastrada();
+        venderIngressos(sessao, 3);
+
+        assertThatThrownBy(() -> atualizarCapacidade(sessao, 2))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(sessao.getCapacidade()).isEqualTo(100);
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00"));
