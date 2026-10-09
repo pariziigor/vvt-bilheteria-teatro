@@ -149,6 +149,19 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("[4.9] Rejeita atualização sem data e hora")
+    void rejeitaAtualizacaoSemDataHora() {
+        Sessao sessao = sessaoCadastrada();
+        DataHoraSessao dataHoraOriginal = sessao.getDataHora();
+
+        assertThatThrownBy(() -> atualizarDataHora(sessao, null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(sessao.getDataHora()).isEqualTo(dataHoraOriginal);
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00"));
