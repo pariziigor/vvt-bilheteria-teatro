@@ -51,6 +51,13 @@ public class Sessao {
         return List.copyOf(ingressos);
     }
 
+    public void atualizar(UUID pecaId, DataHoraSessao dataHora, int capacidade, BigDecimal valorBaseIngresso) {
+        this.pecaId = pecaId;
+        this.dataHora = dataHora;
+        this.capacidade = capacidade;
+        this.valorBaseIngresso = valorBaseIngresso;
+    }
+
     public void registrarIngresso(Ingresso ingresso) {
         Objects.requireNonNull(ingresso, "O ingresso é obrigatório");
         if (ingressos.stream().anyMatch(atual -> atual.getId().equals(ingresso.getId()))) {
