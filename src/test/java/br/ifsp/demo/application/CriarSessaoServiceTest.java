@@ -90,6 +90,14 @@ class CriarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    @DisplayName("[1.6] Rejeita sessão sem data e hora")
+    void rejeitaDataHoraAusentes() {
+        assertThatThrownBy(() -> service.criar(UUID.randomUUID(), null, 100, new BigDecimal("50.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
+    }
+
     private DataHoraSessao dataHoraFutura() {
         return new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
     }
