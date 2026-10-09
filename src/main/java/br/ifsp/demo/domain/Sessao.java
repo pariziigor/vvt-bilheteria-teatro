@@ -3,7 +3,10 @@ package br.ifsp.demo.domain;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 public class Sessao {
 
@@ -15,6 +18,9 @@ public class Sessao {
     private final List<Ingresso> ingressos = new ArrayList<>();
 
     public Sessao(UUID id, UUID pecaId, DataHoraSessao dataHora, int capacidade, BigDecimal valorBaseIngresso) {
+        if (capacidade <= 0) {
+            throw new IllegalArgumentException("A capacidade da sessão deve ser positiva");
+        }
         this.id = id;
         this.pecaId = pecaId;
         this.dataHora = dataHora;
@@ -44,5 +50,51 @@ public class Sessao {
 
     public List<Ingresso> getIngressos() {
         return List.copyOf(ingressos);
+    }
+
+    public void atualizar(UUID pecaId, DataHoraSessao dataHora, int capacidade, BigDecimal valorBaseIngresso) {
+        if (capacidade <= 0) {
+            throw new IllegalArgumentException("A capacidade da sessão deve ser positiva");
+        }
+        long vendidos = ingressos.stream()
+                .filter(atual -> atual.getStatus() == StatusIngresso.VENDIDO)
+                .count();
+        if (capacidade < vendidos) {
+            throw new IllegalArgumentException(
+                    "A capacidade não pode ser menor que a quantidade de ingressos vendidos");
+        }
+        if (dataHora == null || dataHora.data() == null || dataHora.horaInicio() == null
+                || dataHora.horaFim() == null) {
+            throw new IllegalArgumentException("A data e os horários da sessão são obrigatórios");
+        }
+        if (!LocalDateTime.of(dataHora.data(), dataHora.horaInicio()).isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("A sessão deve ocorrer em uma data e horário futuros");
+        }
+        this.pecaId = pecaId;
+        this.dataHora = dataHora;
+        this.capacidade = capacidade;
+        this.valorBaseIngresso = valorBaseIngresso;
+    }
+
+    public void registrarIngresso(Ingresso ingresso) {
+        Objects.requireNonNull(ingresso, "O ingresso é obrigatório");
+        if (ingressos.stream().anyMatch(atual -> atual.getId().equals(ingresso.getId()))) {
+            throw new IllegalArgumentException("Já existe um ingresso com esse identificador na sessão");
+        }
+        long vendidos = ingressos.stream()
+                .filter(atual -> atual.getStatus() == StatusIngresso.VENDIDO)
+                .count();
+        if (ingresso.getStatus() == StatusIngresso.VENDIDO && vendidos >= capacidade) {
+            throw new IllegalStateException("A sessão está lotada");
+        }
+        ingressos.add(ingresso);
+    }
+
+    public void cancelarIngresso(UUID ingressoId) {
+        Ingresso ingresso = ingressos.stream()
+                .filter(atual -> atual.getId().equals(ingressoId))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Ingresso não encontrado na sessão"));
+        ingresso.cancelar();
     }
 }

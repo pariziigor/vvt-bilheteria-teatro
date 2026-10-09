@@ -11,10 +11,14 @@ public class Ingresso {
     private StatusIngresso status;
 
     public Ingresso(UUID id, TipoIngresso tipoIngresso, BigDecimal valor) {
+        this(id, tipoIngresso, valor, StatusIngresso.VENDIDO);
+    }
+
+    public Ingresso(UUID id, TipoIngresso tipoIngresso, BigDecimal valor, StatusIngresso status) {
         this.id = id;
         this.tipoIngresso = tipoIngresso;
         this.valor = valor;
-        this.status = StatusIngresso.VENDIDO;
+        this.status = status;
     }
 
     public UUID getId() {
@@ -31,5 +35,12 @@ public class Ingresso {
 
     public StatusIngresso getStatus() {
         return status;
+    }
+
+    public void cancelar() {
+        if (status != StatusIngresso.VENDIDO) {
+            throw new IllegalStateException("Somente ingressos vendidos podem ser cancelados");
+        }
+        status = StatusIngresso.CANCELADO;
     }
 }
