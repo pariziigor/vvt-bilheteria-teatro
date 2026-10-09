@@ -48,6 +48,24 @@ class CancelarIngressoServiceTest {
         verify(sessaoRepository).salvar(sessao);
     }
 
+    @Test
+    @DisplayName("[7.2] Cancela ingresso de uma sessão lotada")
+    void cancelaIngressoDeSessaoLotada() {
+        Sessao sessao = sessao(1);
+        Ingresso ingresso = ingresso();
+        sessao.registrarIngresso(ingresso);
+        when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        service.cancelar(sessao.getId(), ingresso.getId());
+
+        assertThat(ingresso.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+        assertThat(sessao.getIngressos()).filteredOn(i -> i.getStatus() == StatusIngresso.VENDIDO).isEmpty();
+        Ingresso novoIngresso = ingresso();
+        sessao.registrarIngresso(novoIngresso);
+        assertThat(novoIngresso.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+        verify(sessaoRepository).salvar(sessao);
+    }
+
     private Sessao sessao(int capacidade) {
         return new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(),
