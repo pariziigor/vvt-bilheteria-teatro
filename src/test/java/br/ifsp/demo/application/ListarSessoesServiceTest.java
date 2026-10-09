@@ -39,6 +39,15 @@ class ListarSessoesServiceTest {
         assertThat(service.listar()).containsExactlyElementsOf(sessoes);
     }
 
+    @Test
+    @DisplayName("[2.2] Lista uma sessão cadastrada")
+    void listaUmaSessao() {
+        Sessao sessao = sessao(UUID.randomUUID());
+        when(sessaoRepository.listar()).thenReturn(List.of(sessao));
+
+        assertThat(service.listar()).containsExactly(sessao);
+    }
+
     private Sessao sessao(UUID pecaId) {
         DataHoraSessao dataHora = new DataHoraSessao(
                 LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
