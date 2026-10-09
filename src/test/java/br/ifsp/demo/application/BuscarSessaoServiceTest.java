@@ -14,10 +14,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import java.util.NoSuchElementException;
@@ -67,6 +69,19 @@ class BuscarSessaoServiceTest {
         assertThat(resultado).isEqualTo(procurada);
         assertThat(resultado.getId()).isEqualTo(idProcurado);
     }
+
+    @Test
+    @Tag("UnitTest")
+    @Tag("TDD")
+    @DisplayName("3.3 - Deve informar que a sessão não foi encontrada quando o identificador não existe")
+    void deveInformarQueSessaoNaoFoiEncontrada() {
+        UUID id = UUID.randomUUID();
+        when(repository.buscarPorId(id)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> service.buscar(id))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Sessão não encontrada");
+    }
+
 
     private Sessao criarSessao(UUID id) {
         DataHoraSessao dataHora = new DataHoraSessao(
