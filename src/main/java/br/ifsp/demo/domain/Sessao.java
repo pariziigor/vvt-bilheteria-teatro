@@ -63,6 +63,10 @@ public class Sessao {
             throw new IllegalArgumentException(
                     "A capacidade não pode ser menor que a quantidade de ingressos vendidos");
         }
+        if (dataHora == null || dataHora.data() == null || dataHora.horaInicio() == null
+                || dataHora.horaFim() == null) {
+            throw new IllegalArgumentException("A data e os horários da sessão são obrigatórios");
+        }
         if (!LocalDateTime.of(dataHora.data(), dataHora.horaInicio()).isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("A sessão deve ocorrer em uma data e horário futuros");
         }
