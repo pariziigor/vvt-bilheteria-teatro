@@ -25,6 +25,9 @@ public class AtualizarSessaoService {
                             BigDecimal valorBaseIngresso) {
         Sessao sessao = sessaoRepository.buscarPorId(sessaoId)
                 .orElseThrow(() -> new NoSuchElementException("Sessão não encontrada"));
+        if (pecaId == null) {
+            throw new IllegalArgumentException("A peça associada à sessão é obrigatória");
+        }
         if (!pecaRepository.existe(pecaId)) {
             throw new IllegalArgumentException("A peça informada não existe");
         }
