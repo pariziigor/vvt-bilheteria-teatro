@@ -20,6 +20,12 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verifyNoInteractions;
+
 @ExtendWith(MockitoExtension.class)
 class BuscarSessaoServiceTest {
 
@@ -41,6 +47,25 @@ class BuscarSessaoServiceTest {
         Sessao resultado = service.buscar(id);
 
         assertThat(resultado).isEqualTo(sessao);
+    }
+
+    @Test
+    @Tag("UnitTest")
+    @Tag("TDD")
+    @DisplayName("3.2 - Deve retornar somente a sessão do identificador informado entre várias cadastradas")
+    void deveRetornarSomenteSessaoDoIdentificadorInformado() {
+        UUID idProcurado = UUID.randomUUID();
+        Sessao primeira = criarSessao(UUID.randomUUID());
+        Sessao procurada = criarSessao(idProcurado);
+        Sessao terceira = criarSessao(UUID.randomUUID());
+        lenient().when(repository.buscarPorId(primeira.getId())).thenReturn(Optional.of(primeira));
+        when(repository.buscarPorId(idProcurado)).thenReturn(Optional.of(procurada));
+        lenient().when(repository.buscarPorId(terceira.getId())).thenReturn(Optional.of(terceira));
+
+        Sessao resultado = service.buscar(idProcurado);
+
+        assertThat(resultado).isEqualTo(procurada);
+        assertThat(resultado.getId()).isEqualTo(idProcurado);
     }
 
     private Sessao criarSessao(UUID id) {
