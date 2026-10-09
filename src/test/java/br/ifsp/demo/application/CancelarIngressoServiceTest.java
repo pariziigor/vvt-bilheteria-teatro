@@ -24,6 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+
 @ExtendWith(MockitoExtension.class)
 @Tag("UnitTest")
 @Tag("TDD")
@@ -84,6 +90,22 @@ class CancelarIngressoServiceTest {
         assertThat(segundo.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
         assertThat(terceiro.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
         verify(sessaoRepository).salvar(sessao);
+    }
+
+    @Test
+    @DisplayName("[7.4] Rejeita o cancelamento de um ingresso já cancelado")
+    void rejeitaCancelamentoDeIngressoJaCancelado() {
+        Sessao sessao = sessao(10);
+        Ingresso ingresso = ingresso();
+        sessao.registrarIngresso(ingresso);
+        sessao.cancelarIngresso(ingresso.getId());
+        when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.cancelar(sessao.getId(), ingresso.getId()))
+                .isInstanceOf(IllegalStateException.class);
+
+        assertThat(ingresso.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+        verify(sessaoRepository, never()).salvar(any());
     }
 
     private Sessao sessao(int capacidade) {
