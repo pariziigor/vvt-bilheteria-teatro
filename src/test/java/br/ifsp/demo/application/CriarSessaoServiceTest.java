@@ -79,6 +79,17 @@ class CriarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    @DisplayName("[1.5] Rejeita sessão em data e horário passados")
+    void rejeitaDataHoraPassadas() {
+        DataHoraSessao passada = new DataHoraSessao(
+                LocalDate.now().minusDays(1), LocalTime.of(19, 0), LocalTime.of(21, 0));
+
+        assertThatThrownBy(() -> service.criar(UUID.randomUUID(), passada, 100, new BigDecimal("50.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
+    }
+
     private DataHoraSessao dataHoraFutura() {
         return new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
     }
