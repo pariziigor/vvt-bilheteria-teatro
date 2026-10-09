@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 public class Sessao {
 
@@ -61,6 +62,9 @@ public class Sessao {
         if (capacidade < vendidos) {
             throw new IllegalArgumentException(
                     "A capacidade não pode ser menor que a quantidade de ingressos vendidos");
+        }
+        if (!LocalDateTime.of(dataHora.data(), dataHora.horaInicio()).isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("A sessão deve ocorrer em uma data e horário futuros");
         }
         this.pecaId = pecaId;
         this.dataHora = dataHora;
