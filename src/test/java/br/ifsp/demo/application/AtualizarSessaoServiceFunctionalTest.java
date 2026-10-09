@@ -108,6 +108,19 @@ class AtualizarSessaoServiceFunctionalTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("Rejeita atualização sem peça associada")
+    void rejeitaAtualizacaoSemPecaAssociada() {
+        Sessao sessao = sessaoCadastrada();
+        UUID pecaOriginal = sessao.getPecaId();
+
+        assertThatThrownBy(() -> atualizar(sessao, null, sessao.getDataHora(), 100))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(sessao.getPecaId()).isEqualTo(pecaOriginal);
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(),
