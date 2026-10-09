@@ -1,5 +1,7 @@
 package br.ifsp.demo.api;
 
+import br.ifsp.demo.application.AtualizarSessaoService;
+import br.ifsp.demo.application.BuscarSessaoService;
 import br.ifsp.demo.application.CancelarIngressoService;
 import br.ifsp.demo.application.CriarSessaoService;
 import br.ifsp.demo.application.ListarSessoesService;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,15 +27,21 @@ public class SessaoController {
 
     private final CriarSessaoService criarSessaoService;
     private final ListarSessoesService listarSessoesService;
+    private final BuscarSessaoService buscarSessaoService;
+    private final AtualizarSessaoService atualizarSessaoService;
     private final CancelarIngressoService cancelarIngressoService;
 
     public SessaoController(
             CriarSessaoService criarSessaoService,
             ListarSessoesService listarSessoesService,
+            BuscarSessaoService buscarSessaoService,
+            AtualizarSessaoService atualizarSessaoService,
             CancelarIngressoService cancelarIngressoService
     ) {
         this.criarSessaoService = criarSessaoService;
         this.listarSessoesService = listarSessoesService;
+        this.buscarSessaoService = buscarSessaoService;
+        this.atualizarSessaoService = atualizarSessaoService;
         this.cancelarIngressoService = cancelarIngressoService;
     }
 
@@ -50,6 +59,22 @@ public class SessaoController {
     @GetMapping
     public List<Sessao> listar() {
         return listarSessoesService.listar();
+    }
+
+    @GetMapping("/{sessaoId}")
+    public Sessao buscar(@PathVariable UUID sessaoId) {
+        return buscarSessaoService.buscar(sessaoId);
+    }
+
+    @PutMapping("/{sessaoId}")
+    public Sessao atualizar(@PathVariable UUID sessaoId, @RequestBody AtualizarSessaoRequest request) {
+        return atualizarSessaoService.atualizar(
+                sessaoId,
+                request.pecaId(),
+                new DataHoraSessao(request.data(), request.horaInicio(), request.horaFim()),
+                request.capacidade(),
+                request.valorBaseIngresso()
+        );
     }
 
     @DeleteMapping("/{sessaoId}/ingressos/{ingressoId}")
