@@ -189,6 +189,20 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("[4.12] Informa que a sessão não foi encontrada e não atualiza nada")
+    void informaQueSessaoNaoFoiEncontrada() {
+        UUID sessaoInexistente = UUID.randomUUID();
+        when(sessaoRepository.buscarPorId(sessaoInexistente)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.atualizar(
+                sessaoInexistente, UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00")))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Sessão não encontrada");
+
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00"));
