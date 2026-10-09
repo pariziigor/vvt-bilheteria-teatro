@@ -2,6 +2,7 @@ package br.ifsp.demo.application;
 
 import br.ifsp.demo.domain.ISessaoRepository;
 import br.ifsp.demo.domain.Sessao;
+import java.util.NoSuchElementException;
 
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class BuscarSessaoService {
     }
 
     public Sessao buscar(UUID id) {
-        return repository.buscarPorId(id).orElseThrow();
+        return repository.buscarPorId(id)
+                .orElseThrow(() -> new NoSuchElementException("Sessão não encontrada"));
     }
 }
