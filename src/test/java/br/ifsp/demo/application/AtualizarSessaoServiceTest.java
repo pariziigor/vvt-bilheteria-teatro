@@ -64,7 +64,18 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository).salvar(sessao);
     }
 
-    // NOVOS TESTES ENTRAM AQUI
+    @Test
+    @DisplayName("[4.2] Atualiza a capacidade para o valor mínimo válido")
+    void atualizaCapacidadeParaValorMinimoValido() {
+        Sessao sessao = sessaoCadastrada();
+
+        atualizarCapacidade(sessao, 1);
+
+        assertThat(sessao.getCapacidade()).isEqualTo(1);
+        verify(sessaoRepository).salvar(sessao);
+    }
+
+    //
 
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
