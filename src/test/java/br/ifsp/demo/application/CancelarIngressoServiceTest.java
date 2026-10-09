@@ -66,6 +66,26 @@ class CancelarIngressoServiceTest {
         verify(sessaoRepository).salvar(sessao);
     }
 
+    @Test
+    @DisplayName("[7.3] Cancela um ingresso e preserva os demais vendidos")
+    void cancelaUmIngressoEntreVariosVendidos() {
+        Sessao sessao = sessao(5);
+        Ingresso primeiro = ingresso();
+        Ingresso segundo = ingresso();
+        Ingresso terceiro = ingresso();
+        sessao.registrarIngresso(primeiro);
+        sessao.registrarIngresso(segundo);
+        sessao.registrarIngresso(terceiro);
+        when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        service.cancelar(sessao.getId(), segundo.getId());
+
+        assertThat(primeiro.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+        assertThat(segundo.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+        assertThat(terceiro.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+        verify(sessaoRepository).salvar(sessao);
+    }
+
     private Sessao sessao(int capacidade) {
         return new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(),
