@@ -162,6 +162,18 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("[4.10] Atualiza a peça associada para outra peça existente")
+    void atualizaPecaAssociadaParaOutraPecaExistente() {
+        Sessao sessao = sessaoCadastrada();
+        UUID novaPecaId = UUID.randomUUID();
+
+        atualizarPeca(sessao, novaPecaId);
+
+        assertThat(sessao.getPecaId()).isEqualTo(novaPecaId);
+        verify(sessaoRepository).salvar(sessao);
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00"));
