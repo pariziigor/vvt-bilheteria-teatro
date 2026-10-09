@@ -56,6 +56,17 @@ class ListarSessoesServiceTest {
         assertThat(service.listar()).isEmpty();
     }
 
+    @Test
+    @DisplayName("[2.4] Lista sessões de peças diferentes")
+    void listaSessoesDePecasDiferentes() {
+        Sessao sessaoUm = sessao(UUID.randomUUID());
+        Sessao sessaoDois = sessao(UUID.randomUUID());
+        when(sessaoRepository.listar()).thenReturn(List.of(sessaoUm, sessaoDois));
+
+        assertThat(service.listar()).containsExactly(sessaoUm, sessaoDois);
+        assertThat(service.listar().get(0).getPecaId()).isNotEqualTo(service.listar().get(1).getPecaId());
+    }
+
     private Sessao sessao(UUID pecaId) {
         DataHoraSessao dataHora = new DataHoraSessao(
                 LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
