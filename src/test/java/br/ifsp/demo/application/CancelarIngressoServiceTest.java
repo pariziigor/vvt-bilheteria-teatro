@@ -108,6 +108,22 @@ class CancelarIngressoServiceTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("[7.5] Informa que o ingresso não foi encontrado e não cancela nada")
+    void informaQueIngressoNaoFoiEncontrado() {
+        Sessao sessao = sessao(10);
+        Ingresso vendido = ingresso();
+        sessao.registrarIngresso(vendido);
+        when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.cancelar(sessao.getId(), UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Ingresso não encontrado na sessão");
+
+        assertThat(vendido.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
     private Sessao sessao(int capacidade) {
         return new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(),
