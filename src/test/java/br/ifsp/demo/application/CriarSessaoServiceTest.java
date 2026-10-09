@@ -51,6 +51,18 @@ class CriarSessaoServiceTest {
         verify(sessaoRepository).salvar(sessao);
     }
 
+    @Test
+    @DisplayName("[1.2] Cria sessão com capacidade mínima válida")
+    void criaSessaoComCapacidadeMinimaValida() {
+        UUID pecaId = UUID.randomUUID();
+        when(pecaRepository.existe(pecaId)).thenReturn(true);
+
+        Sessao sessao = service.criar(pecaId, dataHoraFutura(), 1, new BigDecimal("50.00"));
+
+        assertThat(sessao.getCapacidade()).isEqualTo(1);
+        verify(sessaoRepository).salvar(sessao);
+    }
+
     private DataHoraSessao dataHoraFutura() {
         return new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
     }
