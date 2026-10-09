@@ -52,6 +52,9 @@ public class Sessao {
     }
 
     public void atualizar(UUID pecaId, DataHoraSessao dataHora, int capacidade, BigDecimal valorBaseIngresso) {
+        if (capacidade <= 0) {
+            throw new IllegalArgumentException("A capacidade da sessão deve ser positiva");
+        }
         this.pecaId = pecaId;
         this.dataHora = dataHora;
         this.capacidade = capacidade;
