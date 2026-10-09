@@ -124,6 +124,18 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("[4.7] Atualiza a data e hora para um momento futuro válido")
+    void atualizaDataHoraParaMomentoFuturo() {
+        Sessao sessao = sessaoCadastrada();
+        DataHoraSessao novaDataHora = dataHoraFutura(90);
+
+        atualizarDataHora(sessao, novaDataHora);
+
+        assertThat(sessao.getDataHora()).isEqualTo(novaDataHora);
+        verify(sessaoRepository).salvar(sessao);
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00"));
@@ -145,5 +157,15 @@ class AtualizarSessaoServiceTest {
     private void atualizarCapacidade(Sessao sessao, int novaCapacidade) {
         service.atualizar(sessao.getId(), sessao.getPecaId(), sessao.getDataHora(),
                 novaCapacidade, sessao.getValorBaseIngresso());
+    }
+
+    private void atualizarDataHora(Sessao sessao, DataHoraSessao novaDataHora) {
+        service.atualizar(sessao.getId(), sessao.getPecaId(), novaDataHora,
+                sessao.getCapacidade(), sessao.getValorBaseIngresso());
+    }
+
+    private void atualizarPeca(Sessao sessao, UUID novaPecaId) {
+        service.atualizar(sessao.getId(), novaPecaId, sessao.getDataHora(),
+                sessao.getCapacidade(), sessao.getValorBaseIngresso());
     }
 }
