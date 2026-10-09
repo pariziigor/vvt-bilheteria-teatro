@@ -75,7 +75,17 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository).salvar(sessao);
     }
 
-    //
+    @Test
+    @DisplayName("[4.3] Rejeita atualização da capacidade para zero")
+    void rejeitaCapacidadeIgualAZero() {
+        Sessao sessao = sessaoCadastrada();
+
+        assertThatThrownBy(() -> atualizarCapacidade(sessao, 0))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(sessao.getCapacidade()).isEqualTo(100);
+        verify(sessaoRepository, never()).salvar(any());
+    }
 
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
