@@ -99,7 +99,18 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
-    //
+    @Test
+    @DisplayName("[4.5] Atualiza a capacidade para quantidade igual aos ingressos vendidos")
+    void atualizaCapacidadeIgualAosIngressosVendidos() {
+        Sessao sessao = sessaoCadastrada();
+        venderIngressos(sessao, 3);
+
+        atualizarCapacidade(sessao, 3);
+
+        assertThat(sessao.getCapacidade()).isEqualTo(3);
+        verify(sessaoRepository).salvar(sessao);
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00"));
