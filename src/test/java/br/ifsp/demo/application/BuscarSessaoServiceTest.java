@@ -82,6 +82,16 @@ class BuscarSessaoServiceTest {
                 .hasMessage("Sessão não encontrada");
     }
 
+    @Test
+    @Tag("UnitTest")
+    @Tag("TDD")
+    @DisplayName("3.4 - Deve recusar a busca quando o identificador não é informado")
+    void deveRecusarBuscaSemIdentificador() {
+        assertThatThrownBy(() -> service.buscar(null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(repository);
+    }
 
     private Sessao criarSessao(UUID id) {
         DataHoraSessao dataHora = new DataHoraSessao(
