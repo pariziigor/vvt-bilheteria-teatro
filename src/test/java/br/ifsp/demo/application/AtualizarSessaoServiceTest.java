@@ -87,6 +87,19 @@ class AtualizarSessaoServiceTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("[4.4] Rejeita atualização da capacidade para valor negativo")
+    void rejeitaCapacidadeNegativa() {
+        Sessao sessao = sessaoCadastrada();
+
+        assertThatThrownBy(() -> atualizarCapacidade(sessao, -1))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(sessao.getCapacidade()).isEqualTo(100);
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
+    //
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(30), 100, new BigDecimal("50.00"));
