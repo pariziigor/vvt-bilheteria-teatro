@@ -59,6 +59,9 @@ public class SessaoController {
 
     @PostMapping
     public ResponseEntity<Sessao> criar(@RequestBody CriarSessaoRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Os dados da sessão são obrigatórios");
+        }
         Sessao sessao = criarSessaoService.criar(
                 request.pecaId(),
                 new DataHoraSessao(request.data(), request.horaInicio(), request.horaFim()),
@@ -80,6 +83,9 @@ public class SessaoController {
 
     @PutMapping("/{sessaoId}")
     public Sessao atualizar(@PathVariable UUID sessaoId, @RequestBody AtualizarSessaoRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Os dados da sessão são obrigatórios");
+        }
         return atualizarSessaoService.atualizar(
                 sessaoId,
                 request.pecaId(),
@@ -107,6 +113,9 @@ public class SessaoController {
     @PostMapping("/{sessaoId}/ingressos")
     public ResponseEntity<Ingresso> comprarIngresso(@PathVariable UUID sessaoId,
                                                      @RequestBody ComprarIngressoRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Os dados do ingresso são obrigatórios");
+        }
         Ingresso ingresso = comprarIngressoService.comprar(sessaoId, request.tipoIngresso());
         return ResponseEntity.status(201).body(ingresso);
     }
