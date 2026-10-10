@@ -128,7 +128,6 @@ class CancelarIngressoServiceTest {
     @DisplayName("[7.6] Recusa cancelamento sem identificador do ingresso")
     void recusaCancelamentoSemIdentificadorDoIngresso() {
         Sessao sessao = sessao(10);
-        when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
 
         assertThatThrownBy(() -> service.cancelar(sessao.getId(), null))
                 .isInstanceOf(IllegalArgumentException.class);
