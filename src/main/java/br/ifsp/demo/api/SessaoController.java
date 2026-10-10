@@ -5,10 +5,12 @@ import br.ifsp.demo.application.BuscarSessaoService;
 import br.ifsp.demo.application.CancelarIngressoService;
 import br.ifsp.demo.application.CriarSessaoService;
 import br.ifsp.demo.application.ListarSessoesService;
+import br.ifsp.demo.application.RemoverSessaoService;
 import br.ifsp.demo.domain.DataHoraSessao;
 import br.ifsp.demo.domain.Sessao;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/v1/sessoes")
@@ -30,19 +33,22 @@ public class SessaoController {
     private final BuscarSessaoService buscarSessaoService;
     private final AtualizarSessaoService atualizarSessaoService;
     private final CancelarIngressoService cancelarIngressoService;
+    private final RemoverSessaoService removerSessaoService;
 
     public SessaoController(
             CriarSessaoService criarSessaoService,
             ListarSessoesService listarSessoesService,
             BuscarSessaoService buscarSessaoService,
             AtualizarSessaoService atualizarSessaoService,
-            CancelarIngressoService cancelarIngressoService
+            CancelarIngressoService cancelarIngressoService,
+            RemoverSessaoService removerSessaoService
     ) {
         this.criarSessaoService = criarSessaoService;
         this.listarSessoesService = listarSessoesService;
         this.buscarSessaoService = buscarSessaoService;
         this.atualizarSessaoService = atualizarSessaoService;
         this.cancelarIngressoService = cancelarIngressoService;
+        this.removerSessaoService = removerSessaoService;
     }
 
     @PostMapping
@@ -84,5 +90,26 @@ public class SessaoController {
     ) {
         cancelarIngressoService.cancelar(sessaoId, ingressoId);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{sessaoId}")
+    public ResponseEntity<Void> remover(@PathVariable UUID sessaoId) {
+        removerSessaoService.remover(sessaoId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<Void> naoEncontrado() {
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Void> argumentoInvalido() {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Void> conflito() {
+        return ResponseEntity.status(409).build();
     }
 }
