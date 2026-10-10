@@ -641,3 +641,66 @@ TipoIngresso
 
 são Value Objects utilizados para encapsular regras específicas do domínio.
 Assim, regras como capacidade máxima, disponibilidade, cancelamento e tipos de ingresso permanecem protegidas independentemente da camada que esteja utilizando o sistema.
+---
+
+# Implementação atual
+
+O projeto utiliza Spring Boot, Java 21, Spring JDBC e SQLite. O domínio não utiliza JPA, Hibernate ou Lombok.
+
+## Organização
+
+```text
+src/main/java/br/ifsp/demo
+├── api          # Controladores REST e requests
+├── application  # Serviços de aplicação
+├── domain       # Agregados, entidades, value objects e contratos
+└── persistence  # Repositórios JDBC
+```
+
+`Sessao` é o Aggregate Root e controla os ingressos, a capacidade e a disponibilidade.
+
+## API REST
+
+Base URL: `/api/v1/sessoes`
+
+| Método | Endpoint | Operação |
+| --- | --- | --- |
+| POST | `/api/v1/sessoes` | Criar sessão |
+| GET | `/api/v1/sessoes` | Listar sessões |
+| GET | `/api/v1/sessoes/{sessaoId}` | Buscar sessão e disponibilidade |
+| PUT | `/api/v1/sessoes/{sessaoId}` | Atualizar sessão |
+| DELETE | `/api/v1/sessoes/{sessaoId}` | Remover sessão |
+| POST | `/api/v1/sessoes/{sessaoId}/ingressos` | Comprar ingresso |
+| DELETE | `/api/v1/sessoes/{sessaoId}/ingressos/{ingressoId}` | Cancelar ingresso |
+
+Respostas principais: `201 Created`, `204 No Content`, `400 Bad Request`, `404 Not Found` e `409 Conflict`.
+
+## Persistência
+
+O banco é SQLite, configurado em `src/main/resources/application.properties`. O schema está em `src/main/resources/schema.sql` e contém as tabelas `peca`, `sessao` e `ingresso`. A persistência usa `JdbcTemplate`, sem JPA ou Lombok.
+
+## Regras de negócio
+
+- capacidade e valor base devem ser positivos;
+- data e horários da sessão são obrigatórios, e o fim deve ser posterior ao início;
+- sessões devem ocorrer no futuro;
+- tipos aceitos: `INTEIRA`, `ESTUDANTE`, `PCD` e `IDOSO`;
+- descontos: 0%, 50%, 60% e 65%, respectivamente;
+- ingressos vendidos nunca ultrapassam a capacidade;
+- ingressos cancelados não ocupam vagas;
+- sessões encerradas não aceitam vendas;
+- sessões com ingressos vendidos não podem ser removidas;
+- disponibilidade = capacidade menos ingressos vendidos.
+
+## Testes
+
+Os testes usam JUnit 5, Mockito e AssertJ. As tags são `UnitTest`, `TDD` e `Functional`.
+
+```powershell
+mvn clean test
+mvn -Dtest=TddSuite test
+mvn -Dtest=FunctionalSuite test
+mvn -Dtest=UnitTestSuite test
+```
+
+Os testes cobrem criação, busca, atualização e remoção de sessões, compra e cancelamento de ingressos, descontos, capacidade, disponibilidade, sessões encerradas e entradas inválidas.
