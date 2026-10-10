@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,6 +61,32 @@ class CancelarIngressoServiceFunctionalTest {
         assertThatThrownBy(() -> service.cancelar(sessao.getId(), ingresso.getId()))
                 .isInstanceOf(IllegalStateException.class);
         verify(sessaoRepository, never()).salvar(sessao);
+    }
+
+    @Test
+    void recusaCancelamentoSemIdentificador() {
+        Sessao sessao = sessao();
+        assertThatThrownBy(() -> service.cancelar(sessao.getId(), null))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(sessaoRepository, never()).buscarPorId(any());
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
+    @Test
+    void liberaUmaVagaAoCancelar() {
+        Sessao sessao = new Sessao(UUID.randomUUID(), UUID.randomUUID(),
+                new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0)),
+                3, new BigDecimal("50.00"));
+        Ingresso primeiro = new Ingresso(UUID.randomUUID(), new TipoIngresso("INTEIRA"), new BigDecimal("50.00"));
+        Ingresso segundo = new Ingresso(UUID.randomUUID(), new TipoIngresso("INTEIRA"), new BigDecimal("50.00"));
+        sessao.registrarIngresso(primeiro);
+        sessao.registrarIngresso(segundo);
+        when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        service.cancelar(sessao.getId(), primeiro.getId());
+
+        assertThat(sessao.getIngressos()).filteredOn(i -> i.getStatus().name().equals("VENDIDO")).hasSize(1);
+        verify(sessaoRepository).salvar(sessao);
     }
 
     private Sessao sessao() {

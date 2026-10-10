@@ -124,6 +124,37 @@ class CancelarIngressoServiceTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("[7.6] Recusa cancelamento sem identificador do ingresso")
+    void recusaCancelamentoSemIdentificadorDoIngresso() {
+        Sessao sessao = sessao(10);
+        when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.cancelar(sessao.getId(), null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(sessao.getIngressos()).isEmpty();
+        verify(sessaoRepository, never()).buscarPorId(any());
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
+    @Test
+    @DisplayName("[7.7] Atualiza a disponibilidade após cancelamento")
+    void atualizaDisponibilidadeAposCancelamento() {
+        Sessao sessao = sessao(5);
+        Ingresso cancelado = ingresso();
+        Ingresso restante = ingresso();
+        sessao.registrarIngresso(cancelado);
+        sessao.registrarIngresso(restante);
+        when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        service.cancelar(sessao.getId(), cancelado.getId());
+
+        assertThat(sessao.getIngressos()).filteredOn(i -> i.getStatus() == StatusIngresso.VENDIDO).hasSize(1);
+        assertThat(sessao.getIngressos()).filteredOn(i -> i.getStatus() == StatusIngresso.CANCELADO).hasSize(1);
+        verify(sessaoRepository).salvar(sessao);
+    }
+
     private Sessao sessao(int capacidade) {
         return new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(),
