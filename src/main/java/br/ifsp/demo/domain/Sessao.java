@@ -18,6 +18,12 @@ public class Sessao {
     private final List<Ingresso> ingressos = new ArrayList<>();
 
     public Sessao(UUID id, UUID pecaId, DataHoraSessao dataHora, int capacidade, BigDecimal valorBaseIngresso) {
+        Objects.requireNonNull(id, "O identificador da sessão é obrigatório");
+        Objects.requireNonNull(pecaId, "A peça associada à sessão é obrigatória");
+        Objects.requireNonNull(dataHora, "A data e os horários da sessão são obrigatórios");
+        if (valorBaseIngresso == null || valorBaseIngresso.signum() <= 0) {
+            throw new IllegalArgumentException("O valor base do ingresso deve ser positivo");
+        }
         if (capacidade <= 0) {
             throw new IllegalArgumentException("A capacidade da sessão deve ser positiva");
         }
@@ -84,6 +90,11 @@ public class Sessao {
         if (capacidade < vendidos) {
             throw new IllegalArgumentException(
                     "A capacidade não pode ser menor que a quantidade de ingressos vendidos");
+        }
+        Objects.requireNonNull(pecaId, "A peça associada à sessão é obrigatória");
+        Objects.requireNonNull(dataHora, "A data e os horários da sessão são obrigatórios");
+        if (valorBaseIngresso == null || valorBaseIngresso.signum() <= 0) {
+            throw new IllegalArgumentException("O valor base do ingresso deve ser positivo");
         }
         if (dataHora == null || dataHora.data() == null || dataHora.horaInicio() == null
                 || dataHora.horaFim() == null) {

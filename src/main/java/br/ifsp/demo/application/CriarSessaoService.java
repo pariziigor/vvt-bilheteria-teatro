@@ -22,6 +22,9 @@ public class CriarSessaoService {
     }
 
     public Sessao criar(UUID pecaId, DataHoraSessao dataHora, int capacidade, BigDecimal valorBaseIngresso) {
+        if (valorBaseIngresso == null || valorBaseIngresso.signum() <= 0) {
+            throw new IllegalArgumentException("O valor base do ingresso deve ser positivo");
+        }
         if (capacidade <= 0) {
             throw new IllegalArgumentException("A capacidade da sessão deve ser positiva");
         }
