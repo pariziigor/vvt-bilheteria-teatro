@@ -8,6 +8,8 @@ public interface ISessaoRepository {
 
     void salvar(Sessao sessao);
 
+    void remover(UUID id);
+
     Optional<Sessao> buscarPorId(UUID id);
 
     List<Sessao> listar();

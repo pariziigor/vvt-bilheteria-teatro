@@ -70,6 +70,13 @@ public class SessaoRepository implements ISessaoRepository {
     }
 
     @Override
+    @Transactional
+    public void remover(UUID id) {
+        jdbcTemplate.update("DELETE FROM ingresso WHERE sessao_id = ?", id.toString());
+        jdbcTemplate.update("DELETE FROM sessao WHERE id = ?", id.toString());
+    }
+
+    @Override
     public Optional<Sessao> buscarPorId(UUID id) {
         return jdbcTemplate.query("SELECT * FROM sessao WHERE id = ?", SESSAO_MAPPER, id.toString())
                 .stream()
