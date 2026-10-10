@@ -3,6 +3,8 @@ package br.ifsp.demo.application;
 import br.ifsp.demo.domain.DataHoraSessao;
 import br.ifsp.demo.domain.ISessaoRepository;
 import br.ifsp.demo.domain.Sessao;
+import br.ifsp.demo.domain.Ingresso;
+import br.ifsp.demo.domain.TipoIngresso;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -91,6 +93,27 @@ class BuscarSessaoServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
 
         verifyNoInteractions(repository);
+    }
+
+    @Test
+    @Tag("UnitTest")
+    @Tag("TDD")
+    @DisplayName("[3.5] Retorna a disponibilidade da sessão")
+    void deveRetornarDisponibilidadeDaSessao() {
+        UUID id = UUID.randomUUID();
+        Sessao sessao = criarSessao(id);
+        Ingresso vendido = new Ingresso(UUID.randomUUID(), new TipoIngresso("INTEIRA"), new BigDecimal("50.00"));
+        Ingresso cancelado = new Ingresso(UUID.randomUUID(), new TipoIngresso("INTEIRA"), new BigDecimal("50.00"));
+        sessao.registrarIngresso(vendido);
+        sessao.registrarIngresso(cancelado);
+        sessao.cancelarIngresso(cancelado.getId());
+        when(repository.buscarPorId(id)).thenReturn(Optional.of(sessao));
+
+        Sessao resultado = service.buscar(id);
+
+        assertThat(resultado.quantidadeIngressosVendidos()).isEqualTo(1);
+        assertThat(resultado.quantidadeIngressosDisponiveis()).isEqualTo(99);
+        assertThat(resultado.estaLotada()).isFalse();
     }
 
     private Sessao criarSessao(UUID id) {
