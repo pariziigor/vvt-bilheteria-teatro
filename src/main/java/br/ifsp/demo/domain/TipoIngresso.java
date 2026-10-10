@@ -17,6 +17,9 @@ public final class TipoIngresso {
     private final BigDecimal percentualDesconto;
 
     public TipoIngresso(String categoria) {
+        if (categoria == null || !DESCONTOS.containsKey(categoria)) {
+            throw new IllegalArgumentException("Tipo de ingresso inválido");
+        }
         this.categoria = categoria;
         this.percentualDesconto = DESCONTOS.get(categoria);
     }

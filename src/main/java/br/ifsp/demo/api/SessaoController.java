@@ -6,6 +6,9 @@ import br.ifsp.demo.application.CancelarIngressoService;
 import br.ifsp.demo.application.CriarSessaoService;
 import br.ifsp.demo.application.ListarSessoesService;
 import br.ifsp.demo.application.RemoverSessaoService;
+import br.ifsp.demo.application.ComprarIngressoService;
+import br.ifsp.demo.api.ComprarIngressoRequest;
+import br.ifsp.demo.domain.Ingresso;
 import br.ifsp.demo.domain.DataHoraSessao;
 import br.ifsp.demo.domain.Sessao;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +37,7 @@ public class SessaoController {
     private final AtualizarSessaoService atualizarSessaoService;
     private final CancelarIngressoService cancelarIngressoService;
     private final RemoverSessaoService removerSessaoService;
+    private final ComprarIngressoService comprarIngressoService;
 
     public SessaoController(
             CriarSessaoService criarSessaoService,
@@ -41,7 +45,8 @@ public class SessaoController {
             BuscarSessaoService buscarSessaoService,
             AtualizarSessaoService atualizarSessaoService,
             CancelarIngressoService cancelarIngressoService,
-            RemoverSessaoService removerSessaoService
+            RemoverSessaoService removerSessaoService,
+            ComprarIngressoService comprarIngressoService
     ) {
         this.criarSessaoService = criarSessaoService;
         this.listarSessoesService = listarSessoesService;
@@ -49,6 +54,7 @@ public class SessaoController {
         this.atualizarSessaoService = atualizarSessaoService;
         this.cancelarIngressoService = cancelarIngressoService;
         this.removerSessaoService = removerSessaoService;
+        this.comprarIngressoService = comprarIngressoService;
     }
 
     @PostMapping
@@ -96,6 +102,13 @@ public class SessaoController {
     public ResponseEntity<Void> remover(@PathVariable UUID sessaoId) {
         removerSessaoService.remover(sessaoId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{sessaoId}/ingressos")
+    public ResponseEntity<Ingresso> comprarIngresso(@PathVariable UUID sessaoId,
+                                                     @RequestBody ComprarIngressoRequest request) {
+        Ingresso ingresso = comprarIngressoService.comprar(sessaoId, request.tipoIngresso());
+        return ResponseEntity.status(201).body(ingresso);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
