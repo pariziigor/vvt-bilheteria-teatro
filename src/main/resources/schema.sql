@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS peca (
     id TEXT PRIMARY KEY,
     titulo TEXT NOT NULL,
