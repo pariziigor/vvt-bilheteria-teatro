@@ -52,6 +52,28 @@ public class Sessao {
         return List.copyOf(ingressos);
     }
 
+    public long quantidadeIngressosVendidos() {
+        return ingressos.stream()
+                .filter(ingresso -> ingresso.getStatus() == StatusIngresso.VENDIDO)
+                .count();
+    }
+
+    public long getQuantidadeIngressosVendidos() {
+        return quantidadeIngressosVendidos();
+    }
+
+    public long quantidadeIngressosDisponiveis() {
+        return capacidade - quantidadeIngressosVendidos();
+    }
+
+    public long getQuantidadeIngressosDisponiveis() {
+        return quantidadeIngressosDisponiveis();
+    }
+
+    public boolean estaLotada() {
+        return quantidadeIngressosDisponiveis() == 0;
+    }
+
     public void atualizar(UUID pecaId, DataHoraSessao dataHora, int capacidade, BigDecimal valorBaseIngresso) {
         if (capacidade <= 0) {
             throw new IllegalArgumentException("A capacidade da sessão deve ser positiva");
