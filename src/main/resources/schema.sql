@@ -26,3 +26,10 @@ CREATE TABLE IF NOT EXISTS ingresso (
     status TEXT NOT NULL,
     FOREIGN KEY (sessao_id) REFERENCES sessao(id)
 );
+
+CREATE TABLE IF NOT EXISTS usuario (
+    id TEXT PRIMARY KEY,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    senha TEXT NOT NULL
+);
