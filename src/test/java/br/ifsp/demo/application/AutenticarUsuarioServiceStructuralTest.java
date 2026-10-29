@@ -49,7 +49,18 @@ class AutenticarUsuarioServiceStructuralTest {
         assertThat(token).isEqualTo("token-jwt");
     }
 
-    // NOVOS TESTES ENTRAM AQUI
+    @Test
+    @DisplayName("Rejeita autenticação com senha incorreta")
+    void rejeitaSenhaIncorreta() {
+        usuarioCadastrado();
+        when(passwordEncoder.matches("senha-errada", "senha-codificada")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.autenticar("ana@email.com", "senha-errada"))
+                .isInstanceOf(CredenciaisInvalidasException.class)
+                .hasMessage("E-mail ou senha inválidos");
+
+        verify(jwtService, never()).gerarToken(any());
+    }
 
     private Usuario usuarioCadastrado() {
         Usuario usuario = new Usuario(UUID.randomUUID(), "Ana", "ana@email.com", "senha-codificada");
