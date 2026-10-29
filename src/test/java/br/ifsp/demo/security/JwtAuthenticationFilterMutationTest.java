@@ -74,4 +74,18 @@ class JwtAuthenticationFilterMutationTest {
         assertThat(chain.getRequest()).isSameAs(request);
         verifyNoInteractions(jwtService);
     }
+
+    @Test
+    @DisplayName("Remove a autenticação quando o token é inválido")
+    void removeAutenticacaoComTokenInvalido() throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("outro@email.com", null, List.of()));
+        request.addHeader("Authorization", "Bearer token-invalido");
+        when(jwtService.extrairEmail("token-invalido")).thenThrow(new MalformedJwtException("Token inválido"));
+
+        new JwtAuthenticationFilter(jwtService).doFilter(request, response, chain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        assertThat(chain.getRequest()).isSameAs(request);
+    }
 }
