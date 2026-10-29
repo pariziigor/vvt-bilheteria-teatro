@@ -29,6 +29,7 @@ public class SecurityConfig {
     private static final String[] ROTAS_PUBLICAS_DOCUMENTACAO = {
             "/api/v1/api-docs", "/api/v1/api-docs/**",
             "/api/v1/openapi", "/api/v1/openapi/**",
+            "/api/v1/swagger-ui/**",
             "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**"
     };
 
