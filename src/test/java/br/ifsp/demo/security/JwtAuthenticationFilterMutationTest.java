@@ -62,4 +62,16 @@ class JwtAuthenticationFilterMutationTest {
         assertThat(chain.getRequest()).isSameAs(request);
         verifyNoInteractions(jwtService);
     }
+
+    @Test
+    @DisplayName("Não autentica requisição com cabeçalho que não é do tipo Bearer")
+    void naoAutenticaComCabecalhoSemBearer() throws Exception {
+        request.addHeader("Authorization", "Basic YW5hOnNlbmhh");
+
+        new JwtAuthenticationFilter(jwtService).doFilter(request, response, chain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        assertThat(chain.getRequest()).isSameAs(request);
+        verifyNoInteractions(jwtService);
+    }
 }
