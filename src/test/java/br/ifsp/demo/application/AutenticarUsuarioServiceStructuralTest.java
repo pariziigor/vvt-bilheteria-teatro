@@ -62,6 +62,17 @@ class AutenticarUsuarioServiceStructuralTest {
         verify(jwtService, never()).gerarToken(any());
     }
 
+    @Test
+    @DisplayName("Rejeita autenticação de e-mail não cadastrado")
+    void rejeitaEmailNaoCadastrado() {
+        when(usuarioRepository.buscarPorEmail("ninguem@email.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.autenticar("ninguem@email.com", "segredo123"))
+                .isInstanceOf(CredenciaisInvalidasException.class);
+
+        verifyNoInteractions(passwordEncoder, jwtService);
+    }
+
     private Usuario usuarioCadastrado() {
         Usuario usuario = new Usuario(UUID.randomUUID(), "Ana", "ana@email.com", "senha-codificada");
         when(usuarioRepository.buscarPorEmail("ana@email.com")).thenReturn(Optional.of(usuario));
