@@ -27,5 +27,13 @@ class JwtServiceMutationTest {
         assertThat(service.extrairEmail(token)).isEqualTo("ana@email.com");
     }
 
-    // NOVOS TESTES ENTRAM AQUI
+    @Test
+    @DisplayName("Rejeita token assinado com outra chave")
+    void rejeitaTokenAssinadoComOutraChave() {
+        JwtService service = new JwtService(SEGREDO, UMA_HORA);
+        String tokenDeOutraChave = new JwtService(OUTRO_SEGREDO, UMA_HORA).gerarToken("ana@email.com");
+
+        assertThatThrownBy(() -> service.extrairEmail(tokenDeOutraChave))
+                .isInstanceOf(JwtException.class);
+    }
 }
