@@ -48,5 +48,16 @@ class RegistrarUsuarioServiceStructuralTest {
         verify(usuarioRepository).salvar(usuario);
     }
 
-    // NOVOS TESTES ENTRAM AQUI
+    @Test
+    @DisplayName("Rejeita cadastro com e-mail já utilizado")
+    void rejeitaEmailJaCadastrado() {
+        Usuario existente = new Usuario(UUID.randomUUID(), "Outra", "ana@email.com", "hash");
+        when(usuarioRepository.buscarPorEmail("ana@email.com")).thenReturn(Optional.of(existente));
+
+        assertThatThrownBy(() -> service.registrar("Ana", "ana@email.com", "segredo123"))
+                .isInstanceOf(IllegalStateException.class);
+
+        verify(usuarioRepository, never()).salvar(any());
+        verifyNoInteractions(passwordEncoder);
+    }
 }
