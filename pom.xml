@@ -169,6 +169,7 @@
                     </targetClasses>
                     <targetTests>
                         <param>br.ifsp.demo.application.*</param>
+                        <param>br.ifsp.demo.security.*</param>
                     </targetTests>
                 </configuration>
             </plugin>
