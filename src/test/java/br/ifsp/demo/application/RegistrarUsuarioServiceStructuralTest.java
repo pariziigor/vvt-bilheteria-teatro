@@ -70,4 +70,13 @@ class RegistrarUsuarioServiceStructuralTest {
         verifyNoInteractions(usuarioRepository, passwordEncoder);
     }
 
+    @Test
+    @DisplayName("Rejeita cadastro com senha em branco")
+    void rejeitaSenhaEmBranco() {
+        assertThatThrownBy(() -> service.registrar("Ana", "ana@email.com", "   "))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(usuarioRepository, passwordEncoder);
+    }
+
 }
