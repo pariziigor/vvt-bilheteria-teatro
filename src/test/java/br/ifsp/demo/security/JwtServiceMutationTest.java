@@ -36,4 +36,14 @@ class JwtServiceMutationTest {
         assertThatThrownBy(() -> service.extrairEmail(tokenDeOutraChave))
                 .isInstanceOf(JwtException.class);
     }
+
+    @Test
+    @DisplayName("Rejeita token expirado")
+    void rejeitaTokenExpirado() {
+        JwtService service = new JwtService(SEGREDO, -1_000L);
+        String tokenExpirado = service.gerarToken("ana@email.com");
+
+        assertThatThrownBy(() -> service.extrairEmail(tokenExpirado))
+                .isInstanceOf(ExpiredJwtException.class);
+    }
 }
