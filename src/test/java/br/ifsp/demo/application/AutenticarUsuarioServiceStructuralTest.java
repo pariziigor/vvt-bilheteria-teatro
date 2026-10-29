@@ -73,6 +73,15 @@ class AutenticarUsuarioServiceStructuralTest {
         verifyNoInteractions(passwordEncoder, jwtService);
     }
 
+    @Test
+    @DisplayName("Rejeita autenticação com e-mail nulo")
+    void rejeitaEmailNulo() {
+        assertThatThrownBy(() -> service.autenticar(null, "segredo123"))
+                .isInstanceOf(CredenciaisInvalidasException.class);
+
+        verifyNoInteractions(usuarioRepository, passwordEncoder, jwtService);
+    }
+
     private Usuario usuarioCadastrado() {
         Usuario usuario = new Usuario(UUID.randomUUID(), "Ana", "ana@email.com", "senha-codificada");
         when(usuarioRepository.buscarPorEmail("ana@email.com")).thenReturn(Optional.of(usuario));
