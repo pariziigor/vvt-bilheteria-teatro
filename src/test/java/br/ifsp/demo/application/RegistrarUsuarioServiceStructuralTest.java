@@ -60,4 +60,14 @@ class RegistrarUsuarioServiceStructuralTest {
         verify(usuarioRepository, never()).salvar(any());
         verifyNoInteractions(passwordEncoder);
     }
+
+    @Test
+    @DisplayName("Rejeita cadastro com senha nula")
+    void rejeitaSenhaNula() {
+        assertThatThrownBy(() -> service.registrar("Ana", "ana@email.com", null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(usuarioRepository, passwordEncoder);
+    }
+
 }
