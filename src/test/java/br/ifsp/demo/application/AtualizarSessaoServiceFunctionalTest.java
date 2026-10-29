@@ -89,23 +89,15 @@ class AtualizarSessaoServiceFunctionalTest {
     @Test
     @DisplayName("Rejeita data e hora sem horário de início")
     void rejeitaDataHoraSemHorarioDeInicio() {
-        Sessao sessao = sessaoCadastrada();
-        DataHoraSessao semInicio = new DataHoraSessao(LocalDate.now().plusDays(5), null, LocalTime.of(21, 0));
-
-        assertThatThrownBy(() -> atualizar(sessao, sessao.getPecaId(), semInicio, 100))
+        assertThatThrownBy(() -> new DataHoraSessao(LocalDate.now().plusDays(5), null, LocalTime.of(21, 0)))
                 .isInstanceOf(IllegalArgumentException.class);
-        verify(sessaoRepository, never()).salvar(any());
     }
 
     @Test
     @DisplayName("Rejeita data e hora sem a data")
     void rejeitaDataHoraSemData() {
-        Sessao sessao = sessaoCadastrada();
-        DataHoraSessao semData = new DataHoraSessao(null, LocalTime.of(19, 0), LocalTime.of(21, 0));
-
-        assertThatThrownBy(() -> atualizar(sessao, sessao.getPecaId(), semData, 100))
+        assertThatThrownBy(() -> new DataHoraSessao(null, LocalTime.of(19, 0), LocalTime.of(21, 0)))
                 .isInstanceOf(IllegalArgumentException.class);
-        verify(sessaoRepository, never()).salvar(any());
     }
 
     @Test
