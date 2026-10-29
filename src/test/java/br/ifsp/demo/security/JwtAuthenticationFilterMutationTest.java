@@ -53,5 +53,13 @@ class JwtAuthenticationFilterMutationTest {
         assertThat(chain.getRequest()).isSameAs(request);
     }
 
-    // NOVOS TESTES ENTRAM AQUI
+    @Test
+    @DisplayName("Não autentica requisição sem o cabeçalho Authorization")
+    void naoAutenticaSemCabecalho() throws Exception {
+        new JwtAuthenticationFilter(jwtService).doFilter(request, response, chain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        assertThat(chain.getRequest()).isSameAs(request);
+        verifyNoInteractions(jwtService);
+    }
 }
