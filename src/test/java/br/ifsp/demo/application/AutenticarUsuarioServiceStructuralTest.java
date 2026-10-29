@@ -82,6 +82,15 @@ class AutenticarUsuarioServiceStructuralTest {
         verifyNoInteractions(usuarioRepository, passwordEncoder, jwtService);
     }
 
+    @Test
+    @DisplayName("Rejeita autenticação com senha nula")
+    void rejeitaSenhaNula() {
+        assertThatThrownBy(() -> service.autenticar("ana@email.com", null))
+                .isInstanceOf(CredenciaisInvalidasException.class);
+
+        verifyNoInteractions(usuarioRepository, passwordEncoder, jwtService);
+    }
+
     private Usuario usuarioCadastrado() {
         Usuario usuario = new Usuario(UUID.randomUUID(), "Ana", "ana@email.com", "senha-codificada");
         when(usuarioRepository.buscarPorEmail("ana@email.com")).thenReturn(Optional.of(usuario));
