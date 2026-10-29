@@ -50,6 +50,19 @@ class AtualizarSessaoServiceStructuralTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("Rejeita atualização com valor base do ingresso igual a zero")
+    void rejeitaAtualizacaoComValorBaseZero() {
+        Sessao sessao = sessaoCadastrada();
+
+        assertThatThrownBy(() -> service.atualizar(
+                sessao.getId(), sessao.getPecaId(), sessao.getDataHora(), 100, BigDecimal.ZERO))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        assertThat(sessao.getValorBaseIngresso()).isEqualByComparingTo("50.00");
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
     // NOVOS TESTES ENTRAM AQUI
 
     private Sessao sessaoCadastrada() {
