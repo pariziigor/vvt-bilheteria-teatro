@@ -63,8 +63,6 @@ class AtualizarSessaoServiceStructuralTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
-    // NOVOS TESTES ENTRAM AQUI
-
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(),
