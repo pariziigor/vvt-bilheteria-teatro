@@ -97,4 +97,13 @@ class RegistrarUsuarioServiceStructuralTest {
         verify(usuarioRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("Rejeita cadastro com e-mail nulo")
+    void rejeitaEmailNulo() {
+        assertThatThrownBy(() -> service.registrar("Ana", null, "segredo123"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(usuarioRepository, never()).salvar(any());
+    }
+
 }
