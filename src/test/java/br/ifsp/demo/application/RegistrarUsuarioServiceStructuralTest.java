@@ -88,4 +88,13 @@ class RegistrarUsuarioServiceStructuralTest {
         verify(usuarioRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("Rejeita cadastro com nome em branco")
+    void rejeitaNomeEmBranco() {
+        assertThatThrownBy(() -> service.registrar("   ", "ana@email.com", "segredo123"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(usuarioRepository, never()).salvar(any());
+    }
+
 }
