@@ -79,4 +79,13 @@ class RegistrarUsuarioServiceStructuralTest {
         verifyNoInteractions(usuarioRepository, passwordEncoder);
     }
 
+    @Test
+    @DisplayName("Rejeita cadastro com nome nulo")
+    void rejeitaNomeNulo() {
+        assertThatThrownBy(() -> service.registrar(null, "ana@email.com", "segredo123"))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(usuarioRepository, never()).salvar(any());
+    }
+
 }
