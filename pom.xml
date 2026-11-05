@@ -169,6 +169,8 @@
                     </targetClasses>
                     <targetTests>
                         <param>br.ifsp.demo.application.*</param>
+                        <param>br.ifsp.demo.domain.*</param>
+                        <param>br.ifsp.demo.persistence.*</param>
                         <param>br.ifsp.demo.security.*</param>
                     </targetTests>
                 </configuration>
