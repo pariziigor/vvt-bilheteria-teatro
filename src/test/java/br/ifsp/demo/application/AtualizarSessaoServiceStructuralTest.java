@@ -41,6 +41,7 @@ class AtualizarSessaoServiceStructuralTest {
     @DisplayName("Rejeita atualização sem valor base do ingresso")
     void rejeitaAtualizacaoSemValorBase() {
         Sessao sessao = sessaoCadastrada();
+        when(pecaRepository.existe(sessao.getPecaId())).thenReturn(true);
 
         assertThatThrownBy(() -> service.atualizar(
                 sessao.getId(), sessao.getPecaId(), sessao.getDataHora(), 100, null))
@@ -54,6 +55,7 @@ class AtualizarSessaoServiceStructuralTest {
     @DisplayName("Rejeita atualização com valor base do ingresso igual a zero")
     void rejeitaAtualizacaoComValorBaseZero() {
         Sessao sessao = sessaoCadastrada();
+        when(pecaRepository.existe(sessao.getPecaId())).thenReturn(true);
 
         assertThatThrownBy(() -> service.atualizar(
                 sessao.getId(), sessao.getPecaId(), sessao.getDataHora(), 100, BigDecimal.ZERO))
@@ -63,13 +65,27 @@ class AtualizarSessaoServiceStructuralTest {
         verify(sessaoRepository, never()).salvar(any());
     }
 
+    @Test
+    @DisplayName("Rejeita atualização sem peça associada")
+    void rejeitaAtualizacaoSemPecaAssociada() {
+        Sessao sessao = sessaoCadastrada();
+        UUID pecaOriginal = sessao.getPecaId();
+
+        assertThatThrownBy(() -> service.atualizar(
+                sessao.getId(), null, sessao.getDataHora(), 100, new BigDecimal("50.00")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("A peça associada à sessão é obrigatória");
+
+        assertThat(sessao.getPecaId()).isEqualTo(pecaOriginal);
+        verify(sessaoRepository, never()).salvar(any());
+    }
+
     private Sessao sessaoCadastrada() {
         Sessao sessao = new Sessao(
                 UUID.randomUUID(), UUID.randomUUID(),
                 new DataHoraSessao(LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0)),
                 100, new BigDecimal("50.00"));
         when(sessaoRepository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
-        when(pecaRepository.existe(sessao.getPecaId())).thenReturn(true);
         return sessao;
     }
 }

@@ -67,7 +67,8 @@ class CriarSessaoServiceTest {
     @DisplayName("[1.3] Rejeita capacidade igual a zero")
     void rejeitaCapacidadeIgualAZero() {
         assertThatThrownBy(() -> service.criar(UUID.randomUUID(), dataHoraFutura(), 0, new BigDecimal("50.00")))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("A capacidade da sessão deve ser positiva");
         verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
     }
 
@@ -75,7 +76,8 @@ class CriarSessaoServiceTest {
     @DisplayName("[1.4] Rejeita capacidade negativa")
     void rejeitaCapacidadeNegativa() {
         assertThatThrownBy(() -> service.criar(UUID.randomUUID(), dataHoraFutura(), -1, new BigDecimal("50.00")))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("A capacidade da sessão deve ser positiva");
         verify(sessaoRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
     }
 
