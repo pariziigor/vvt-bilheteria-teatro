@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(rotas -> rotas
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/usuarios", "/api/v1/autenticacao").permitAll()
+                        .requestMatchers("/", "/index.html", "/assets/**").permitAll()
                         .requestMatchers(ROTAS_PUBLICAS_DOCUMENTACAO).permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated())

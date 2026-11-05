@@ -675,6 +675,24 @@ Base URL: `/api/v1/sessoes`
 
 Respostas principais: `201 Created`, `204 No Content`, `400 Bad Request`, `404 Not Found` e `409 Conflict`.
 
+## Executar o back-end e o front-end
+
+O front-end é servido pelo próprio Spring Boot e não precisa de Node.js, npm ou de um servidor separado. Ele permite criar uma conta, entrar, consultar as peças cadastradas e cadastrar novas peças.
+
+Requisitos: Java 21.
+
+Na raiz do projeto, inicie a aplicação:
+
+```bash
+./mvnw spring-boot:run
+```
+
+No Windows, use `mvnw.cmd spring-boot:run`. Depois, acesse [http://localhost:8080](http://localhost:8080). A API permanece disponível em `/api/v1` e a documentação Swagger em `/api/v1/api-docs`.
+
+Para usar a interface, crie uma conta na aba **Criar conta** e entre com o e-mail e a senha. O cadastro e a autenticação usam `/api/v1/usuarios` e `/api/v1/autenticacao`; depois do login, a programação e o formulário de cadastro de peças são carregados pela API. O token fica armazenado na sessão do navegador e é removido ao sair ou quando a API informa que expirou.
+
+Ao abrir a aplicação em outro endereço ou porta, configure `CORS_ALLOWED_ORIGINS` com a origem do front-end. Quando a interface for acessada pela mesma aplicação Spring Boot, nenhuma configuração adicional de CORS é necessária.
+
 ## Persistência
 
 O banco é SQLite, configurado em `src/main/resources/application.properties`. O schema está em `src/main/resources/schema.sql` e contém as tabelas `peca`, `sessao` e `ingresso`. A persistência usa `JdbcTemplate`, sem JPA ou Lombok.
