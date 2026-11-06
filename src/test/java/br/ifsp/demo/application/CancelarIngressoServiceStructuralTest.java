@@ -122,6 +122,20 @@ class CancelarIngressoServiceStructuralTest {
         verify(repository).salvar(sessao);
     }
 
+    @Test
+    @Tag("Mutation")
+    void naoSalvaIngressoQuandoSessaoJaComecou() {
+        Sessao sessao = sessao(LocalDate.now().minusDays(1));
+        Ingresso ingresso = ingresso("ana@email.com");
+        sessao.registrarIngresso(ingresso);
+        when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.cancelar(sessao.getId(), ingresso.getId(), "ana@email.com", false))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("O cancelamento só é permitido até o início da sessão");
+        assertThat(ingresso.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+        verify(repository, never()).salvar(any());
+    }
 
     private Sessao sessao(LocalDate data) {
         return new Sessao(UUID.randomUUID(), UUID.randomUUID(),
