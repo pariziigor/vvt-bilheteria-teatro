@@ -56,4 +56,15 @@ class RemoverPecaServiceStructuralTest {
         verify(repository, never()).remover(id);
     }
 
+    @Test
+    @Tag("Mutation")
+    void removePecaExistenteSemSessoes() {
+        UUID id = UUID.randomUUID();
+        when(repository.existe(id)).thenReturn(true);
+        when(repository.possuiSessoes(id)).thenReturn(false);
+
+        service.remover(id);
+
+        verify(repository).remover(id);
+    }
 }
