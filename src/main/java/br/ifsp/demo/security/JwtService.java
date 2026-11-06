@@ -1,5 +1,6 @@
 package br.ifsp.demo.security;
 
+import br.ifsp.demo.domain.PapelUsuario;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -23,9 +24,14 @@ public class JwtService {
     }
 
     public String gerarToken(String email) {
+        return gerarToken(email, PapelUsuario.CLIENTE);
+    }
+
+    public String gerarToken(String email, PapelUsuario papel) {
         Date agora = new Date();
         return Jwts.builder()
                 .setSubject(email)
+                .claim("papel", papel.name())
                 .setIssuedAt(agora)
                 .setExpiration(new Date(agora.getTime() + expiracaoEmMilissegundos))
                 .signWith(chave, SignatureAlgorithm.HS256)
@@ -39,5 +45,15 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public PapelUsuario extrairPapel(String token) {
+        String papel = Jwts.parserBuilder()
+                .setSigningKey(chave)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("papel", String.class);
+        return papel == null ? PapelUsuario.CLIENTE : PapelUsuario.valueOf(papel);
     }
 }

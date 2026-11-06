@@ -27,6 +27,6 @@ public class AutenticarUsuarioService {
         Usuario usuario = usuarioRepository.buscarPorEmail(email)
                 .filter(encontrado -> passwordEncoder.matches(senha, encontrado.getSenhaCodificada()))
                 .orElseThrow(CredenciaisInvalidasException::new);
-        return jwtService.gerarToken(usuario.getEmail());
+        return jwtService.gerarToken(usuario.getEmail(), usuario.getPapel());
     }
 }

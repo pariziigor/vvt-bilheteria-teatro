@@ -11,6 +11,8 @@ import br.ifsp.demo.api.ComprarIngressoRequest;
 import br.ifsp.demo.domain.Ingresso;
 import br.ifsp.demo.domain.DataHoraSessao;
 import br.ifsp.demo.domain.Sessao;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,7 +60,8 @@ public class SessaoController {
     }
 
     @PostMapping
-    public ResponseEntity<Sessao> criar(@RequestBody CriarSessaoRequest request) {
+    public ResponseEntity<SessaoResponse> criar(@RequestBody CriarSessaoRequest request,
+                                                Authentication authentication) {
         if (request == null) {
             throw new IllegalArgumentException("Os dados da sessão são obrigatórios");
         }
@@ -68,39 +71,48 @@ public class SessaoController {
                 request.capacidade(),
                 request.valorBaseIngresso()
         );
-        return ResponseEntity.created(URI.create("/api/v1/sessoes/" + sessao.getId())).body(sessao);
+        return ResponseEntity.created(URI.create("/api/v1/sessoes/" + sessao.getId()))
+                .body(SessaoResponse.de(sessao, authentication.getName(), isAdmin(authentication)));
     }
 
     @GetMapping
-    public List<Sessao> listar() {
-        return listarSessoesService.listar();
+    public List<SessaoResponse> listar(Authentication authentication) {
+        boolean administrador = isAdmin(authentication);
+        String usuarioEmail = authentication == null ? null : authentication.getName();
+        return listarSessoesService.listar().stream()
+                .map(sessao -> SessaoResponse.de(sessao, usuarioEmail, administrador))
+                .toList();
     }
 
     @GetMapping("/{sessaoId}")
-    public Sessao buscar(@PathVariable UUID sessaoId) {
-        return buscarSessaoService.buscar(sessaoId);
+    public SessaoResponse buscar(@PathVariable UUID sessaoId, Authentication authentication) {
+        String usuarioEmail = authentication == null ? null : authentication.getName();
+        return SessaoResponse.de(buscarSessaoService.buscar(sessaoId), usuarioEmail, isAdmin(authentication));
     }
 
     @PutMapping("/{sessaoId}")
-    public Sessao atualizar(@PathVariable UUID sessaoId, @RequestBody AtualizarSessaoRequest request) {
+    public SessaoResponse atualizar(@PathVariable UUID sessaoId, @RequestBody AtualizarSessaoRequest request,
+                                    Authentication authentication) {
         if (request == null) {
             throw new IllegalArgumentException("Os dados da sessão são obrigatórios");
         }
-        return atualizarSessaoService.atualizar(
+        Sessao sessao = atualizarSessaoService.atualizar(
                 sessaoId,
                 request.pecaId(),
                 new DataHoraSessao(request.data(), request.horaInicio(), request.horaFim()),
                 request.capacidade(),
                 request.valorBaseIngresso()
         );
+        return SessaoResponse.de(sessao, authentication.getName(), isAdmin(authentication));
     }
 
     @DeleteMapping("/{sessaoId}/ingressos/{ingressoId}")
     public ResponseEntity<Void> cancelarIngresso(
             @PathVariable UUID sessaoId,
-            @PathVariable UUID ingressoId
+            @PathVariable UUID ingressoId,
+            Authentication authentication
     ) {
-        cancelarIngressoService.cancelar(sessaoId, ingressoId);
+        cancelarIngressoService.cancelar(sessaoId, ingressoId, authentication.getName(), isAdmin(authentication));
         return ResponseEntity.noContent().build();
     }
 
@@ -111,13 +123,14 @@ public class SessaoController {
     }
 
     @PostMapping("/{sessaoId}/ingressos")
-    public ResponseEntity<Ingresso> comprarIngresso(@PathVariable UUID sessaoId,
-                                                     @RequestBody ComprarIngressoRequest request) {
+    public ResponseEntity<IngressoResponse> comprarIngresso(@PathVariable UUID sessaoId,
+                                                            @RequestBody ComprarIngressoRequest request,
+                                                            Authentication authentication) {
         if (request == null) {
             throw new IllegalArgumentException("Os dados do ingresso são obrigatórios");
         }
-        Ingresso ingresso = comprarIngressoService.comprar(sessaoId, request.tipoIngresso());
-        return ResponseEntity.status(201).body(ingresso);
+        Ingresso ingresso = comprarIngressoService.comprar(sessaoId, request.tipoIngresso(), authentication.getName());
+        return ResponseEntity.status(201).body(IngressoResponse.de(ingresso));
     }
 
     @ExceptionHandler(NoSuchElementException.class)
@@ -133,5 +146,15 @@ public class SessaoController {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Void> conflito() {
         return ResponseEntity.status(409).build();
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Void> acessoNegado() {
+        return ResponseEntity.status(403).build();
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 }

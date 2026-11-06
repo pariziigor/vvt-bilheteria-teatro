@@ -1,6 +1,7 @@
 package br.ifsp.demo.persistence;
 
 import br.ifsp.demo.domain.IUsuarioRepository;
+import br.ifsp.demo.domain.PapelUsuario;
 import br.ifsp.demo.domain.Usuario;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,7 +17,8 @@ public class UsuarioRepository implements IUsuarioRepository {
             UUID.fromString(rs.getString("id")),
             rs.getString("nome"),
             rs.getString("email"),
-            rs.getString("senha")
+            rs.getString("senha"),
+            PapelUsuario.valueOf(rs.getString("papel"))
     );
 
     private final JdbcTemplate jdbcTemplate;
@@ -28,11 +30,12 @@ public class UsuarioRepository implements IUsuarioRepository {
     @Override
     public void salvar(Usuario usuario) {
         jdbcTemplate.update(
-                "INSERT INTO usuario (id, nome, email, senha) VALUES (?, ?, ?, ?)",
+                "INSERT INTO usuario (id, nome, email, senha, papel) VALUES (?, ?, ?, ?, ?)",
                 usuario.getId().toString(),
                 usuario.getNome(),
                 usuario.getEmail(),
-                usuario.getSenhaCodificada()
+                usuario.getSenhaCodificada(),
+                usuario.getPapel().name()
         );
     }
 

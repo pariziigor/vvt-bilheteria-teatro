@@ -3,6 +3,7 @@ package br.ifsp.demo.application;
 import br.ifsp.demo.domain.Ingresso;
 import br.ifsp.demo.domain.ISessaoRepository;
 import br.ifsp.demo.domain.Sessao;
+import br.ifsp.demo.domain.StatusIngresso;
 import br.ifsp.demo.domain.TipoIngresso;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,10 @@ public class ComprarIngressoService {
     }
 
     public Ingresso comprar(UUID sessaoId, String categoria) {
+        return comprar(sessaoId, categoria, null);
+    }
+
+    public Ingresso comprar(UUID sessaoId, String categoria, String compradorEmail) {
         if (sessaoId == null || categoria == null) {
             throw new IllegalArgumentException("Sessão e tipo de ingresso são obrigatórios");
         }
@@ -33,7 +38,7 @@ public class ComprarIngressoService {
         BigDecimal valor = sessao.getValorBaseIngresso()
                 .multiply(BigDecimal.ONE.subtract(tipo.getPercentualDesconto()))
                 .setScale(2, RoundingMode.HALF_UP);
-        Ingresso ingresso = new Ingresso(UUID.randomUUID(), tipo, valor);
+        Ingresso ingresso = new Ingresso(UUID.randomUUID(), tipo, valor, StatusIngresso.VENDIDO, compradorEmail);
         sessao.registrarIngresso(ingresso);
         sessaoRepository.salvar(sessao);
         return ingresso;

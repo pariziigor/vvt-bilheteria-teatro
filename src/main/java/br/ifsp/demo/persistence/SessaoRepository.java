@@ -59,12 +59,14 @@ public class SessaoRepository implements ISessaoRepository {
         jdbcTemplate.update("DELETE FROM ingresso WHERE sessao_id = ?", sessao.getId().toString());
         for (Ingresso ingresso : sessao.getIngressos()) {
             jdbcTemplate.update(
-                    "INSERT INTO ingresso (id, sessao_id, categoria, valor, status) VALUES (?, ?, ?, ?, ?)",
+                    "INSERT INTO ingresso (id, sessao_id, categoria, valor, status, comprador_email) "
+                            + "VALUES (?, ?, ?, ?, ?, ?)",
                     ingresso.getId().toString(),
                     sessao.getId().toString(),
                     ingresso.getTipoIngresso().getCategoria(),
                     ingresso.getValor().toPlainString(),
-                    ingresso.getStatus().name()
+                    ingresso.getStatus().name(),
+                    ingresso.getCompradorEmail() == null ? "" : ingresso.getCompradorEmail()
             );
         }
     }
@@ -99,7 +101,8 @@ public class SessaoRepository implements ISessaoRepository {
                         UUID.fromString(rs.getString("id")),
                         new TipoIngresso(rs.getString("categoria")),
                         new BigDecimal(rs.getString("valor")),
-                        StatusIngresso.valueOf(rs.getString("status"))
+                        StatusIngresso.valueOf(rs.getString("status")),
+                        rs.getString("comprador_email")
                 ),
                 sessao.getId().toString()
         );

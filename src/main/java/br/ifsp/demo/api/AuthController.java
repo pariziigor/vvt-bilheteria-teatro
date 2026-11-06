@@ -4,6 +4,7 @@ import br.ifsp.demo.application.AutenticarUsuarioService;
 import br.ifsp.demo.application.CredenciaisInvalidasException;
 import br.ifsp.demo.application.RegistrarUsuarioService;
 import br.ifsp.demo.domain.Usuario;
+import br.ifsp.demo.security.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,11 +21,14 @@ public class AuthController {
 
     private final RegistrarUsuarioService registrarUsuarioService;
     private final AutenticarUsuarioService autenticarUsuarioService;
+    private final JwtService jwtService;
 
     public AuthController(RegistrarUsuarioService registrarUsuarioService,
-                          AutenticarUsuarioService autenticarUsuarioService) {
+                          AutenticarUsuarioService autenticarUsuarioService,
+                          JwtService jwtService) {
         this.registrarUsuarioService = registrarUsuarioService;
         this.autenticarUsuarioService = autenticarUsuarioService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/usuarios")
@@ -36,7 +40,8 @@ public class AuthController {
 
     @PostMapping("/autenticacao")
     public AutenticacaoResponse autenticar(@RequestBody AutenticarUsuarioRequest request) {
-        return new AutenticacaoResponse(autenticarUsuarioService.autenticar(request.email(), request.senha()));
+        String token = autenticarUsuarioService.autenticar(request.email(), request.senha());
+        return new AutenticacaoResponse(token, jwtService.extrairPapel(token).name());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

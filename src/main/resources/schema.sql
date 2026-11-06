@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS ingresso (
     categoria TEXT NOT NULL,
     valor TEXT NOT NULL,
     status TEXT NOT NULL,
+    comprador_email TEXT NOT NULL DEFAULT '',
     FOREIGN KEY (sessao_id) REFERENCES sessao(id)
 );
 
@@ -31,5 +32,6 @@ CREATE TABLE IF NOT EXISTS usuario (
     id TEXT PRIMARY KEY,
     nome TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    senha TEXT NOT NULL
+    senha TEXT NOT NULL,
+    papel TEXT NOT NULL DEFAULT 'CLIENTE'
 );

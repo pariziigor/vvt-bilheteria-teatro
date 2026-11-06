@@ -9,8 +9,13 @@ public class Usuario {
     private final String nome;
     private final String email;
     private final String senhaCodificada;
+    private final PapelUsuario papel;
 
     public Usuario(UUID id, String nome, String email, String senhaCodificada) {
+        this(id, nome, email, senhaCodificada, PapelUsuario.CLIENTE);
+    }
+
+    public Usuario(UUID id, String nome, String email, String senhaCodificada, PapelUsuario papel) {
         Objects.requireNonNull(id, "O identificador do usuário é obrigatório");
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("O nome do usuário é obrigatório");
@@ -22,6 +27,7 @@ public class Usuario {
         this.nome = nome;
         this.email = email;
         this.senhaCodificada = senhaCodificada;
+        this.papel = Objects.requireNonNull(papel, "O papel do usuário é obrigatório");
     }
 
     public UUID getId() {
@@ -38,5 +44,9 @@ public class Usuario {
 
     public String getSenhaCodificada() {
         return senhaCodificada;
+    }
+
+    public PapelUsuario getPapel() {
+        return papel;
     }
 }
