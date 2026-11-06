@@ -32,6 +32,20 @@ class SessaoStructuralTest {
                 .isInstanceOf(NullPointerException.class);
     }
 
+    @Test
+    @Tag("Mutation")
+    void rejeitaValorBaseNaoPositivoECapacidadeNaoPositiva() {
+        assertThatThrownBy(() -> sessao(1, null))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao(1, BigDecimal.ZERO))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao(1, new BigDecimal("-0.01")))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao(0, valor()))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao(-1, valor()))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 
 
 
