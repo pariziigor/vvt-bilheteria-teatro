@@ -67,6 +67,17 @@ class DemoAccountsInitializerMutationTest {
         verifyNoInteractions(passwordEncoder);
     }
 
+    @Test
+    @Tag("Mutation")
+    void naoConsultaRepositorioQuandoInicializacaoEstaDesabilitada() {
+        DemoAccountsInitializer initializer = new DemoAccountsInitializer(
+                usuarioRepository, passwordEncoder, false,
+                "cliente@teste.com", "senha-cliente", "admin@teste.com", "senha-admin");
+
+        initializer.run(null);
+
+        verifyNoInteractions(usuarioRepository, passwordEncoder);
+    }
 
     private DemoAccountsInitializer initializer(boolean enabled) {
         return new DemoAccountsInitializer(usuarioRepository, passwordEncoder, enabled,
