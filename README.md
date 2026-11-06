@@ -661,7 +661,14 @@ src/main/java/br/ifsp/demo
 
 ## API REST
 
-Base URL: `/api/v1/sessoes`
+| Método | Endpoint | Operação |
+| --- | --- | --- |
+| GET | `/api/v1/pecas` | Listar peças |
+| POST | `/api/v1/pecas` | Cadastrar peça |
+| PUT | `/api/v1/pecas/{pecaId}` | Atualizar peça |
+| DELETE | `/api/v1/pecas/{pecaId}` | Remover peça sem sessões |
+
+Rotas de sessões:
 
 | Método | Endpoint | Operação |
 | --- | --- | --- |
@@ -677,7 +684,7 @@ Respostas principais: `201 Created`, `204 No Content`, `400 Bad Request`, `404 N
 
 ## Executar o back-end e o front-end
 
-O front-end é servido pelo próprio Spring Boot e não precisa de Node.js, npm ou de um servidor separado. Qualquer visitante pode consultar peças, sessões, horários, preços e disponibilidade sem entrar. Para comprar ingressos ou administrar a programação, basta acessar a conta com o papel correspondente.
+O front-end é servido pelo próprio Spring Boot e não precisa de Node.js, npm ou de um servidor separado. Qualquer visitante pode consultar as peças sem entrar. Ao selecionar uma peça, a interface abre uma tela própria com sinopse e sessões, horários, preços e disponibilidade. Para comprar ingressos ou administrar a programação, basta acessar a conta com o papel correspondente.
 
 Requisitos: Java 21.
 
@@ -689,7 +696,16 @@ Na raiz do projeto, inicie a aplicação:
 
 No Windows, use `mvnw.cmd spring-boot:run`. Depois, acesse [http://localhost:8080](http://localhost:8080). A API permanece disponível em `/api/v1` e a documentação Swagger em `/api/v1/api-docs`.
 
-Para comprar ingressos, crie uma conta na aba **Criar conta** e entre com o e-mail e a senha. Todas as contas criadas pela tela pública recebem o papel `CLIENTE`: podem consultar peças e sessões, comprar ingressos e cancelar apenas os próprios ingressos. O papel não pode ser escolhido no cadastro. A interface de login fica abaixo da programação, e o botão **Entrar** no cabeçalho leva até ela.
+Na primeira inicialização, são criadas duas contas demonstrativas caso os e-mails ainda não existam:
+
+| Papel | E-mail | Senha |
+| --- | --- | --- |
+| Cliente | `cliente.teste@teatro.com` | `Cliente123!` |
+| Administrador | `admin.teste@teatro.com` | `Admin123!` |
+
+As senhas podem ser substituídas pelas variáveis `DEMO_CLIENT_PASSWORD` e `DEMO_ADMIN_PASSWORD`; os e-mails também podem ser configurados por `DEMO_CLIENT_EMAIL` e `DEMO_ADMIN_EMAIL`. Para desativar a criação das contas demonstrativas, configure `DEMO_ACCOUNTS_ENABLED=false`. Essas contas são destinadas ao ambiente local de avaliação.
+
+Para comprar ingressos, use **Entrar** no cabeçalho para abrir a tela de acesso. Nela, escolha **Criar conta** ou entre com o e-mail e a senha. Todas as contas criadas pela tela pública recebem o papel `CLIENTE`: podem consultar peças e sessões, comprar ingressos e cancelar apenas os próprios ingressos. O papel não pode ser escolhido no cadastro. Ao iniciar a compra de uma sessão sem estar autenticado, após entrar ou criar a conta você retorna às sessões daquela peça.
 
 Para conceder acesso administrativo, primeiro crie a conta normalmente. Pare a aplicação e, na raiz do projeto, promova o e-mail desejado no SQLite:
 
@@ -697,7 +713,7 @@ Para conceder acesso administrativo, primeiro crie a conta normalmente. Pare a a
 sqlite3 database.db "UPDATE usuario SET papel = 'ADMIN' WHERE email = 'seu@email.com';"
 ```
 
-Reinicie a aplicação, saia da conta na interface e entre novamente para receber um token com o novo papel. Administradores podem cadastrar peças, criar, editar e remover sessões, consultar todas as vendas e cancelar ingressos. O back-end também aplica essas permissões à API; esconder botões na interface não é o único controle. Usuários existentes recebem o papel `CLIENTE` na migração automática do banco. Ingressos antigos, criados antes do registro do comprador, não podem ser cancelados por clientes; administradores ainda podem gerenciá-los.
+Reinicie a aplicação, saia da conta na interface e entre novamente para receber um token com o novo papel. Administradores podem cadastrar, editar e remover peças sem sessões; ao abrir uma peça, podem criar, editar e remover suas sessões, consultar as vendas e cancelar ingressos. O back-end também aplica essas permissões à API; esconder botões na interface não é o único controle. Usuários existentes recebem o papel `CLIENTE` na migração automática do banco. Ingressos antigos, criados antes do registro do comprador, não podem ser cancelados por clientes; administradores ainda podem gerenciá-los.
 
 O cadastro e a autenticação usam `/api/v1/usuarios` e `/api/v1/autenticacao`. O token fica armazenado na sessão do navegador e é removido ao sair ou quando a API informa que expirou.
 
