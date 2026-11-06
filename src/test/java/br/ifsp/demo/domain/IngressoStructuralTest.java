@@ -35,6 +35,19 @@ class IngressoStructuralTest {
         assertThat(associado.getCompradorEmail()).isEqualTo("cliente@email.com");
     }
 
+    @Test
+    @Tag("Mutation")
+    void cancelaIngressoVendidoERejeitaOutrosEstados() {
+        Ingresso vendido = ingresso(StatusIngresso.VENDIDO);
+        vendido.cancelar();
+        assertThat(vendido.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+
+        Ingresso jaCancelado = ingresso(StatusIngresso.CANCELADO);
+        assertThatThrownBy(jaCancelado::cancelar)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Somente ingressos vendidos podem ser cancelados");
+        assertThat(jaCancelado.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+    }
 
     private Ingresso ingresso(StatusIngresso status) {
         return new Ingresso(UUID.randomUUID(), new TipoIngresso("INTEIRA"), new BigDecimal("50.00"), status);
