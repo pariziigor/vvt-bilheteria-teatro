@@ -73,6 +73,18 @@ class RemoverSessaoServiceStructuralTest {
         verify(repository).remover(soComIngressoCancelado.getId());
     }
 
+    @Test
+    @Tag("Mutation")
+    void recusaRemoverSessaoComIngressoVendido() {
+        Sessao sessao = sessao();
+        sessao.registrarIngresso(ingresso(StatusIngresso.VENDIDO));
+        when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.remover(sessao.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Não é possível remover uma sessão com ingressos vendidos");
+        verify(repository, never()).remover(any());
+    }
 
     private Sessao sessao() {
         return new Sessao(UUID.randomUUID(), UUID.randomUUID(),
