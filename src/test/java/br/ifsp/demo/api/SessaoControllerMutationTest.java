@@ -88,6 +88,35 @@ class SessaoControllerMutationTest {
                 .satisfies(response -> assertThat(response.ingressos()).isEmpty());
     }
 
+    @Test
+    @Tag("Mutation")
+    void buscaEAtualizaSessaoComOuSemUsuarioAutenticado() {
+        Sessao sessao = sessaoComIngressos();
+        UUID sessaoId = sessao.getId();
+        when(buscarSessaoService.buscar(sessaoId)).thenReturn(sessao);
+
+        assertThat(controller.buscar(sessaoId, null).ingressos()).isEmpty();
+        assertThat(controller.buscar(sessaoId, authentication("ana@teste.com", "ROLE_CLIENTE"))
+                .ingressos()).hasSize(1);
+        assertThat(controller.buscar(sessaoId, authentication("admin@teste.com", "ROLE_ADMIN"))
+                .ingressos()).hasSize(2);
+
+        UUID pecaId = UUID.randomUUID();
+        LocalDate data = LocalDate.now().plusDays(40);
+        BigDecimal valor = new BigDecimal("80.00");
+        AtualizarSessaoRequest request = new AtualizarSessaoRequest(
+                pecaId, data, LocalTime.of(18, 0), LocalTime.of(20, 0), 12, valor);
+        Authentication cliente = authentication("ana@teste.com", "ROLE_CLIENTE");
+        when(atualizarSessaoService.atualizar(eq(sessaoId), eq(pecaId), any(DataHoraSessao.class), eq(12), eq(valor)))
+                .thenReturn(sessao);
+
+        SessaoResponse atualizada = controller.atualizar(sessaoId, request, cliente);
+
+        assertThat(atualizada.id()).isEqualTo(sessaoId);
+        assertThat(atualizada.ingressos()).hasSize(1);
+        verify(atualizarSessaoService).atualizar(sessaoId, pecaId,
+                new DataHoraSessao(data, LocalTime.of(18, 0), LocalTime.of(20, 0)), 12, valor);
+    }
 
 
 
