@@ -42,5 +42,18 @@ class RemoverPecaServiceStructuralTest {
         verifyNoMoreInteractions(repository);
     }
 
+    @Test
+    @Tag("Mutation")
+    void rejeitaPecaQueAindaPossuiSessoes() {
+        UUID id = UUID.randomUUID();
+        when(repository.existe(id)).thenReturn(true);
+        when(repository.possuiSessoes(id)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.remover(id))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Remova as sessões desta peça antes de removê-la.");
+
+        verify(repository, never()).remover(id);
+    }
 
 }
