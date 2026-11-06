@@ -26,14 +26,14 @@ A rodada complementar usou `-DtargetTests=br.ifsp.demo.*`. Os 33 alvos foram env
 
 | Pacote | Linhas cobertas | Mutantes mortos / gerados | Sem cobertura |
 | --- | ---: | ---: | ---: |
-| `api` | 32/82 (39%) | 9/39 | 30 |
-| `application` | 138/143 (97%) | 65/69 | 4 |
+| `api` | 82/82 (100%) | 39/39 | 0 |
+| `application` | 143/143 (100%) | 69/69 | 0 |
 | `domain` | 137/137 (100%) | 82/83 | 0 |
 | `persistence` | 120/123 (98%) | 23/23 | 0 |
 | `security` | 62/62 (100%) | 14/14 | 0 |
-| **Total** | **489/547 (89%)** | **193/228 (85%)** | **34** |
+| **Total** | **544/547 (99%)** | **227/228 (99.6%)** | **0** |
 
-Na nova rodada, PIT gerou 133 mutantes: matou 99, não encontrou sobreviventes e marcou 34 como `NO_COVERAGE`. Os 34 mutantes sem cobertura estão em `IngressoResponse` (1), `SessaoController` (24), `SessaoResponse` (5) e `AtualizarPecaService` (4). Assim, a força de teste dos mutantes alcançados na rodada complementar foi 99/99 (100%). No consolidado, um sobrevivente da rodada anterior é equivalente e está justificado abaixo; a força de teste restante é 193/194 (99%).
+Na rodada complementar final, PIT gerou e matou 133 mutantes, sem sobreviventes ou mutantes `NO_COVERAGE`; foram examinadas 90 classes de teste. A cobertura de linhas dos alvos complementares foi 303/306 (99%) e a força de teste foi 133/133 (100%). No consolidado, resta apenas o equivalente da rodada antiga, justificado abaixo; os outros 227/227 mutantes alcançados foram mortos.
 
 ## Mutantes equivalentes
 
@@ -43,4 +43,4 @@ Na nova rodada, PIT gerou 133 mutantes: matou 99, não encontrou sobreviventes e
 
 O registro antigo preservou a classe, a linha e a descrição da mutação, mas não o ordinal numérico do relatório PIT. O identificador acima usa o mutador PIT e a localização da alteração, que identificam a mutação registrada.
 
-Os mutantes vivos encontrados nesta análise nas classes de sessões, ingressos e persistência foram cobertos por testes e mortos. Nenhum defeito de produção foi confirmado, portanto não foi aberta issue `bug`.
+Todos os mutantes não equivalentes encontrados nas classes de sessões, ingressos, API e persistência foram cobertos por testes e mortos. O único mutante não morto é o equivalente de `TipoIngresso` descrito na tabela. Nenhum defeito de produção foi confirmado, portanto não foi aberta issue `bug`.

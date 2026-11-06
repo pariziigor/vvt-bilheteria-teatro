@@ -1,6 +1,6 @@
 # Cobertura estrutural
 
-Os testes estruturais estão marcados com `@Tag("Structural")` e `@Tag("UnitTest")`. A suíte final `UnitTestSuite` executou 185 testes, sem falhas, erros ou testes ignorados. A cobertura de decisões/branches foi coletada pelo agente de cobertura da IntelliJ IDEA 2026.2.2.
+Os testes estruturais estão marcados com `@Tag("Structural")` e `@Tag("UnitTest")`. A suíte final `UnitTestSuite` executou 192 testes, sem falhas, erros ou testes ignorados. A cobertura de decisões/branches foi coletada pelo agente de cobertura da IntelliJ IDEA 2026.2.2.
 
 ## Cobertura de branches
 
