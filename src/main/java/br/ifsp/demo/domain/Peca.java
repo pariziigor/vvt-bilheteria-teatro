@@ -47,4 +47,12 @@ public class Peca {
     public String getClassificacao() {
         return classificacao;
     }
+
+    public void atualizar(String titulo, String descricao, Duration duracao, String classificacao) {
+        Peca dadosAtualizados = new Peca(id, titulo, descricao, duracao, classificacao);
+        this.titulo = dadosAtualizados.titulo;
+        this.descricao = dadosAtualizados.descricao;
+        this.duracao = dadosAtualizados.duracao;
+        this.classificacao = dadosAtualizados.classificacao;
+    }
 }

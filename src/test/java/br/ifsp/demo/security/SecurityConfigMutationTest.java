@@ -3,8 +3,10 @@ package br.ifsp.demo.security;
 import br.ifsp.demo.api.AuthController;
 import br.ifsp.demo.api.PecaController;
 import br.ifsp.demo.application.CadastrarPecaService;
+import br.ifsp.demo.application.AtualizarPecaService;
 import br.ifsp.demo.application.CredenciaisInvalidasException;
 import br.ifsp.demo.application.ListarPecasService;
+import br.ifsp.demo.application.RemoverPecaService;
 import br.ifsp.demo.application.AutenticarUsuarioService;
 import br.ifsp.demo.application.RegistrarUsuarioService;
 import br.ifsp.demo.domain.Peca;
@@ -57,6 +59,10 @@ class SecurityConfigMutationTest {
     private AutenticarUsuarioService autenticarUsuarioService;
     @MockBean
     private CadastrarPecaService cadastrarPecaService;
+    @MockBean
+    private AtualizarPecaService atualizarPecaService;
+    @MockBean
+    private RemoverPecaService removerPecaService;
     @MockBean
     private ListarPecasService listarPecasService;
     @MockBean

@@ -48,11 +48,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(rotas -> rotas
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/usuarios", "/api/v1/autenticacao").permitAll()
-                        .requestMatchers("/", "/index.html", "/assets/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/login.html", "/sessoes.html",
+                                "/meus-ingressos.html", "/assets/**").permitAll()
                         .requestMatchers(ROTAS_PUBLICAS_DOCUMENTACAO).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/pecas", "/api/v1/sessoes", "/api/v1/sessoes/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/pecas").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/pecas/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/pecas/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/sessoes/*/ingressos").hasRole("CLIENTE")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/sessoes/*/ingressos/*")
                         .hasAnyRole("ADMIN", "CLIENTE")
