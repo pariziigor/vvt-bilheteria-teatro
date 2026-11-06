@@ -1,12 +1,12 @@
 package br.ifsp.demo.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
-import java.time.LocalDateTime;
 
 public class Sessao {
 
@@ -126,6 +126,10 @@ public class Sessao {
                 .filter(atual -> atual.getId().equals(ingressoId))
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("Ingresso não encontrado na sessão"));
+        LocalDateTime inicioSessao = LocalDateTime.of(dataHora.data(), dataHora.horaInicio());
+        if (LocalDateTime.now().isAfter(inicioSessao)) {
+            throw new IllegalStateException("O cancelamento só é permitido até o início da sessão");
+        }
         ingresso.cancelar();
     }
 }

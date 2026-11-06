@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.NoSuchElementException;
 
@@ -144,8 +145,8 @@ public class SessaoController {
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Void> conflito() {
-        return ResponseEntity.status(409).build();
+    public ResponseEntity<Map<String, String>> conflito(IllegalStateException exception) {
+        return ResponseEntity.status(409).body(Map.of("mensagem", exception.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
