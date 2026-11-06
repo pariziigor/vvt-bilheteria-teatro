@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f3ee" />
+    <meta name="description" content="Entre ou crie sua conta na Bilheteria do Teatro." />
+    <title>Entrar · Bilheteria do Teatro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/styles.css?v=14" />
+    <script src="/assets/auth.js?v=3" defer></script>
+  </head>
+  <body class="login-page">
+    <header class="topbar login-topbar">
+      <a class="brand" href="/" aria-label="Bilheteria do Teatro, início">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span>bilheteria<span class="brand-light">.teatro</span></span>
+      </a>
+      <a class="login-back" href="/">← Voltar à programação</a>
+    </header>
+
+    <main class="login-main">
+      <section class="login-copy">
+        <p class="eyebrow eyebrow-dark">Acesso à bilheteria</p>
+        <h1>O espetáculo<br />espera<br />por você.</h1>
+        <p>Entre para comprar ingressos e acompanhar suas sessões. Ainda não tem conta? Crie uma em poucos passos.</p>
+      </section>
+
+      <section class="auth-panel login-panel" aria-labelledby="auth-title">
+        <div class="auth-intro">
+          <div>
+            <p class="eyebrow eyebrow-dark">Bilheteria do Teatro</p>
+            <h2 id="auth-title">Acesse sua conta</h2>
+            <p>Use seu e-mail e senha para continuar.</p>
+          </div>
+        </div>
+        <div class="auth-box">
+          <div class="auth-tabs" role="tablist" aria-label="Acesso à conta">
+            <button class="auth-tab active" id="login-tab" type="button" role="tab" aria-selected="true">
+              Entrar
+            </button>
+            <button class="auth-tab" id="register-tab" type="button" role="tab" aria-selected="false">
+              Criar conta
+            </button>
+          </div>
+          <form id="auth-form">
+            <label class="field hidden" id="name-field">
+              Seu nome
+              <input name="nome" autocomplete="name" maxlength="120" placeholder="Seu nome completo" />
+            </label>
+            <label class="field">
+              E-mail
+              <input name="email" type="email" autocomplete="email" required placeholder="voce@email.com" />
+            </label>
+            <label class="field">
+              Senha
+              <input name="senha" type="password" autocomplete="current-password" required placeholder="Sua senha" />
+            </label>
+            <button class="button button-dark button-full" id="auth-submit" type="submit">
+              Entrar <span aria-hidden="true">↗</span>
+            </button>
+            <p class="form-message" id="auth-message" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer login-footer">
+      <span>© Bilheteria do Teatro</span>
+      <span>Programação e venda de ingressos</span>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f3ee" />
+    <meta name="description" content="Consulte e gerencie seus ingressos para o teatro." />
+    <title>Meus ingressos · Bilheteria do Teatro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/styles.css?v=15" />
+    <script src="/assets/meus-ingressos.js?v=3" defer></script>
+  </head>
+  <body class="tickets-page">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Bilheteria do Teatro, início">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span>bilheteria<span class="brand-light">.teatro</span></span>
+      </a>
+      <nav class="topnav" aria-label="Navegação principal">
+        <a href="/">Programação</a>
+        <a id="nav-login" class="text-button" href="/login.html">Entrar</a>
+        <button class="text-button hidden" id="nav-user" type="button">Sair</button>
+      </nav>
+    </header>
+
+    <main class="program-section tickets-main">
+      <section class="tickets-section" aria-labelledby="tickets-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow eyebrow-dark">Sua conta</p>
+            <h2 id="tickets-title">Meus <em>ingressos</em></h2>
+            <p class="section-description">Compras e sessões em um só lugar.</p>
+          </div>
+        </div>
+        <div class="notice hidden" id="ticket-notice" role="status" aria-live="polite"></div>
+        <div class="catalog-state ticket-state" id="ticket-state">
+          <div class="empty-mark" aria-hidden="true">✳</div>
+          <p>Carregando seus ingressos…</p>
+        </div>
+        <div class="ticket-grid hidden" id="ticket-grid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>© Bilheteria do Teatro</span>
+      <span>Programação e venda de ingressos</span>
+    </footer>
+  </body>
+</html>
