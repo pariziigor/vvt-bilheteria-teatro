@@ -65,6 +65,20 @@ class CancelarIngressoServiceStructuralTest {
         verify(repository, never()).salvar(any());
     }
 
+    @Test
+    @Tag("Mutation")
+    void clienteNaoPodeCancelarIngressoDeOutroComprador() {
+        Sessao sessao = sessao(LocalDate.now().plusDays(30));
+        Ingresso ingresso = ingresso("bruno@email.com");
+        sessao.registrarIngresso(ingresso);
+        when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.cancelar(sessao.getId(), ingresso.getId(), "ana@email.com", false))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessage("Só o comprador pode cancelar este ingresso");
+        assertThat(ingresso.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+        verify(repository, never()).salvar(any());
+    }
 
 
 
