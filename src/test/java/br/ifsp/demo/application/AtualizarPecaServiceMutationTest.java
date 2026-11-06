@@ -44,4 +44,17 @@ class AtualizarPecaServiceMutationTest {
         verify(pecaRepository).atualizar(peca);
     }
 
+    @Test
+    @Tag("Mutation")
+    void informaQuandoPecaNaoExisteENaoAtualizaRepositorio() {
+        UUID id = UUID.randomUUID();
+        when(pecaRepository.buscarPorId(id)).thenReturn(Optional.empty());
+        AtualizarPecaService service = new AtualizarPecaService(pecaRepository);
+
+        assertThatThrownBy(() -> service.atualizar(
+                id, "Novo", "Sinopse", Duration.ofMinutes(90), "10"))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Peça não encontrada");
+        verify(pecaRepository, never()).atualizar(org.mockito.ArgumentMatchers.any());
+    }
 }
