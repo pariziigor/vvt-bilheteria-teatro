@@ -38,4 +38,18 @@ class DatabaseSchemaMigrationMutationTest {
         verifyNoMoreInteractions(jdbcTemplate);
     }
 
+    @Test
+    @Tag("Mutation")
+    void naoTentaAdicionarColunasQueJaExistem() {
+        when(jdbcTemplate.queryForList("PRAGMA table_info(usuario)"))
+                .thenReturn(List.of(Map.of("name", "PAPEL")));
+        when(jdbcTemplate.queryForList("PRAGMA table_info(ingresso)"))
+                .thenReturn(List.of(Map.of("name", "comprador_email")));
+        DatabaseSchemaMigration migration = new DatabaseSchemaMigration(jdbcTemplate);
+
+        migration.run(null);
+
+        verify(jdbcTemplate, never()).execute(org.mockito.ArgumentMatchers.anyString());
+        verifyNoMoreInteractions(jdbcTemplate);
+    }
 }
