@@ -10,6 +10,7 @@ import br.ifsp.demo.application.RemoverPecaService;
 import br.ifsp.demo.application.AutenticarUsuarioService;
 import br.ifsp.demo.application.RegistrarUsuarioService;
 import br.ifsp.demo.domain.Peca;
+import br.ifsp.demo.domain.PapelUsuario;
 import br.ifsp.demo.domain.Usuario;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -118,6 +119,7 @@ class SecurityConfigMutationTest {
     void permiteAutenticarUsuarioSemAutenticacao() throws Exception {
         when(autenticarUsuarioService.autenticar("ana@email.com", "segredo123"))
                 .thenReturn("token-jwt");
+        when(jwtService.extrairPapel("token-jwt")).thenReturn(PapelUsuario.CLIENTE);
 
         mockMvc.perform(post("/api/v1/autenticacao")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -125,7 +127,8 @@ class SecurityConfigMutationTest {
                                 {"email":"ana@email.com","senha":"segredo123"}
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("token-jwt"));
+                .andExpect(jsonPath("$.token").value("token-jwt"))
+                .andExpect(jsonPath("$.papel").value("CLIENTE"));
 
         org.assertj.core.api.Assertions.assertThat(filterChainProxy.getFilterChains())
                 .anySatisfy(cadeia -> org.assertj.core.api.Assertions.assertThat(cadeia.getFilters())
@@ -162,6 +165,7 @@ class SecurityConfigMutationTest {
         UUID id = UUID.randomUUID();
         Peca peca = new Peca(id, "Hamlet", "Drama", Duration.ofMinutes(150), "14 anos");
         when(jwtService.extrairEmail("token-valido")).thenReturn("ana@email.com");
+        when(jwtService.extrairPapel("token-valido")).thenReturn(PapelUsuario.ADMIN);
         when(cadastrarPecaService.cadastrar("Hamlet", "Drama", Duration.ofMinutes(150), "14 anos"))
                 .thenReturn(peca);
 
@@ -181,10 +185,8 @@ class SecurityConfigMutationTest {
     void listaPecasNaApi() throws Exception {
         Peca peca = new Peca(UUID.randomUUID(), "Hamlet", "Drama", Duration.ofMinutes(150), "14 anos");
         when(listarPecasService.listar()).thenReturn(List.of(peca));
-        when(jwtService.extrairEmail("token-valido")).thenReturn("ana@email.com");
 
-        mockMvc.perform(get("/api/v1/pecas")
-                        .header("Authorization", "Bearer token-valido"))
+        mockMvc.perform(get("/api/v1/pecas"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].titulo").value("Hamlet"))
                 .andExpect(jsonPath("$[0].duracaoMinutos").value(150));
@@ -194,6 +196,7 @@ class SecurityConfigMutationTest {
     @DisplayName("Retorna erro de dados inválidos ao cadastrar peça")
     void retornaErroParaPecaInvalida() throws Exception {
         when(jwtService.extrairEmail("token-valido")).thenReturn("ana@email.com");
+        when(jwtService.extrairPapel("token-valido")).thenReturn(PapelUsuario.ADMIN);
         when(cadastrarPecaService.cadastrar("", "Drama", Duration.ofMinutes(150), "14 anos"))
                 .thenThrow(new IllegalArgumentException("Os dados textuais da peça são obrigatórios"));
 
@@ -209,7 +212,11 @@ class SecurityConfigMutationTest {
     @Test
     @DisplayName("Exige autenticação para rotas protegidas")
     void exigeAutenticacaoParaRotasProtegidas() throws Exception {
-        mockMvc.perform(get("/api/v1/pecas"))
+        mockMvc.perform(post("/api/v1/pecas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"titulo":"Hamlet","descricao":"Drama","duracaoMinutos":150,"classificacao":"14 anos"}
+                                """))
                 .andExpect(status().isUnauthorized());
     }
 

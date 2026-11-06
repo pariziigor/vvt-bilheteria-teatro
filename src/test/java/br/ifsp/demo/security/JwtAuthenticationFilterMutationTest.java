@@ -1,5 +1,6 @@
 package br.ifsp.demo.security;
 
+import br.ifsp.demo.domain.PapelUsuario;
 import io.jsonwebtoken.MalformedJwtException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +44,7 @@ class JwtAuthenticationFilterMutationTest {
     void autenticaRequisicaoComTokenValido() throws Exception {
         request.addHeader("Authorization", "Bearer token-valido");
         when(jwtService.extrairEmail("token-valido")).thenReturn("ana@email.com");
+        when(jwtService.extrairPapel("token-valido")).thenReturn(PapelUsuario.CLIENTE);
 
         new JwtAuthenticationFilter(jwtService).doFilter(request, response, chain);
 
