@@ -1,9 +1,13 @@
 package br.ifsp.demo.persistence;
 
 import br.ifsp.demo.domain.DataHoraSessao;
+import br.ifsp.demo.domain.Ingresso;
 import br.ifsp.demo.domain.ISessaoRepository;
 import br.ifsp.demo.domain.Sessao;
+import br.ifsp.demo.domain.StatusIngresso;
+import br.ifsp.demo.domain.TipoIngresso;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,4 +44,6 @@ class SessaoRepositoryTest {
         assertThat(armazenada.get().getCapacidade()).isEqualTo(100);
         assertThat(armazenada.get().getValorBaseIngresso()).isEqualByComparingTo("50.00");
     }
+
+
 }
