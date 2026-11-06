@@ -157,6 +157,17 @@ class SessaoControllerMutationTest {
         verify(removerSessaoService).remover(sessaoId);
     }
 
+    @Test
+    @Tag("Mutation")
+    void converteExcecoesEmRespostasHttp() {
+        assertThat(controller.naoEncontrado().getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(controller.argumentoInvalido().getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(controller.conflito(new IllegalStateException("conflito")).getStatusCode())
+                .isEqualTo(HttpStatus.CONFLICT);
+        assertThat(controller.conflito(new IllegalStateException("conflito")).getBody())
+                .containsEntry("mensagem", "conflito");
+        assertThat(controller.acessoNegado().getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
 
     private Authentication authentication(String email, String role) {
         Authentication authentication = org.mockito.Mockito.mock(Authentication.class);
