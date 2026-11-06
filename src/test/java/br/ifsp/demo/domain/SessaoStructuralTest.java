@@ -120,6 +120,26 @@ class SessaoStructuralTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    @Tag("Mutation")
+    void registraIngressoERejeitaNuloDuplicadoOuVendaAcimaDaCapacidade() {
+        Sessao sessao = sessao(1, valor());
+        UUID ingressoId = UUID.randomUUID();
+        Ingresso vendido = ingresso(ingressoId, StatusIngresso.VENDIDO);
+
+        assertThatThrownBy(() -> sessao.registrarIngresso(null))
+                .isInstanceOf(NullPointerException.class);
+        sessao.registrarIngresso(vendido);
+        assertThatThrownBy(() -> sessao.registrarIngresso(ingresso(ingressoId, StatusIngresso.CANCELADO)))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao.registrarIngresso(ingresso(StatusIngresso.VENDIDO)))
+                .isInstanceOf(IllegalStateException.class);
+
+        Ingresso cancelado = ingresso(StatusIngresso.CANCELADO);
+        sessao.registrarIngresso(cancelado);
+        assertThat(sessao.getIngressos()).containsExactly(vendido, cancelado);
+        assertThat(sessao.quantidadeIngressosVendidos()).isEqualTo(1);
+    }
 
 
     private Sessao sessao(int capacidade, BigDecimal valorBase) {
