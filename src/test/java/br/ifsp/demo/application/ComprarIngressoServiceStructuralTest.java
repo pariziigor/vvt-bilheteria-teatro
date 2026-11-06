@@ -89,6 +89,24 @@ class ComprarIngressoServiceStructuralTest {
         verify(repository).salvar(sessao);
     }
 
+    @Test
+    @Tag("Mutation")
+    void rejeitaCategoriaInvalidaESessaoLotada() {
+        Sessao sessao = sessao(LocalDate.now().plusDays(2), 1);
+        when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.comprar(sessao.getId(), "VIP"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Tipo de ingresso inválido");
+        verify(repository, never()).salvar(any());
+
+        sessao.registrarIngresso(new Ingresso(UUID.randomUUID(), new TipoIngresso("INTEIRA"),
+                new BigDecimal("50.00")));
+        assertThatThrownBy(() -> service.comprar(sessao.getId(), "INTEIRA"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("A sessão está lotada");
+        verify(repository, never()).salvar(any());
+    }
 
     private Sessao sessao(LocalDate data, int capacidade) {
         return new Sessao(UUID.randomUUID(), UUID.randomUUID(),
