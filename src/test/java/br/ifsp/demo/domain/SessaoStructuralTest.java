@@ -141,6 +141,29 @@ class SessaoStructuralTest {
         assertThat(sessao.quantidadeIngressosVendidos()).isEqualTo(1);
     }
 
+    @Test
+    @Tag("Mutation")
+    void cancelaIngressoExistenteAntesDoInicioESinalizaAusenteOuSessaoIniciada() {
+        Sessao futura = sessao(2, valor());
+        Ingresso ingresso = ingresso(StatusIngresso.VENDIDO);
+        futura.registrarIngresso(ingresso);
+        futura.cancelarIngresso(ingresso.getId());
+        assertThat(ingresso.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+        assertThat(futura.quantidadeIngressosDisponiveis()).isEqualTo(2);
+        assertThatThrownBy(() -> futura.cancelarIngresso(ingresso.getId()))
+                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> futura.cancelarIngresso(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+
+        Sessao passada = new Sessao(UUID.randomUUID(), UUID.randomUUID(),
+                new DataHoraSessao(LocalDate.now().minusDays(1), LocalTime.of(19, 0), LocalTime.of(21, 0)),
+                1, valor());
+        Ingresso ingressoDeSessaoPassada = ingresso(StatusIngresso.VENDIDO);
+        passada.registrarIngresso(ingressoDeSessaoPassada);
+        assertThatThrownBy(() -> passada.cancelarIngresso(ingressoDeSessaoPassada.getId()))
+                .isInstanceOf(IllegalStateException.class);
+        assertThat(ingressoDeSessaoPassada.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+    }
 
     private Sessao sessao(int capacidade, BigDecimal valorBase) {
         return new Sessao(UUID.randomUUID(), UUID.randomUUID(), dataHoraFutura(), capacidade, valorBase);
