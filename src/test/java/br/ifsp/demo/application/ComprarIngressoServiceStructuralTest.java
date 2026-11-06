@@ -61,6 +61,17 @@ class ComprarIngressoServiceStructuralTest {
         verify(repository, never()).salvar(any());
     }
 
+    @Test
+    @Tag("Mutation")
+    void rejeitaSessaoEncerrada() {
+        Sessao sessao = sessao(LocalDate.now().minusDays(1), 2);
+        when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.comprar(sessao.getId(), "INTEIRA"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("A sessão já foi encerrada");
+        verify(repository, never()).salvar(any());
+    }
 
 
 
