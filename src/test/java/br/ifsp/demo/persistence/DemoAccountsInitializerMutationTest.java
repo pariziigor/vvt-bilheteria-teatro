@@ -52,6 +52,20 @@ class DemoAccountsInitializerMutationTest {
                 .containsExactly("hash-cliente", "hash-admin");
     }
 
+    @Test
+    @Tag("Mutation")
+    void naoDuplicaContasDeDemonstracaoJaExistentes() {
+        when(usuarioRepository.buscarPorEmail("cliente@teste.com"))
+                .thenReturn(Optional.of(usuario("cliente@teste.com", PapelUsuario.CLIENTE)));
+        when(usuarioRepository.buscarPorEmail("admin@teste.com"))
+                .thenReturn(Optional.of(usuario("admin@teste.com", PapelUsuario.ADMIN)));
+        DemoAccountsInitializer initializer = initializer(true);
+
+        initializer.run(null);
+
+        verify(usuarioRepository, never()).salvar(org.mockito.ArgumentMatchers.any());
+        verifyNoInteractions(passwordEncoder);
+    }
 
 
     private DemoAccountsInitializer initializer(boolean enabled) {
