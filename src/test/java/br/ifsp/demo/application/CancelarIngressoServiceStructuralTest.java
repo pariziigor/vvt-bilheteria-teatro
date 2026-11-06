@@ -80,6 +80,29 @@ class CancelarIngressoServiceStructuralTest {
         verify(repository, never()).salvar(any());
     }
 
+    @Test
+    @Tag("Mutation")
+    void clienteCancelaProprioIngressoEAdministradorPodeCancelarIngressoDeOutro() {
+        Sessao sessaoDoCliente = sessao(LocalDate.now().plusDays(30));
+        Ingresso ingressoDoCliente = ingresso("ana@email.com");
+        sessaoDoCliente.registrarIngresso(ingressoDoCliente);
+        when(repository.buscarPorId(sessaoDoCliente.getId())).thenReturn(Optional.of(sessaoDoCliente));
+
+        service.cancelar(sessaoDoCliente.getId(), ingressoDoCliente.getId(), "ana@email.com", false);
+
+        assertThat(ingressoDoCliente.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+        verify(repository).salvar(sessaoDoCliente);
+
+        Sessao sessaoAdministrada = sessao(LocalDate.now().plusDays(30));
+        Ingresso ingressoDeOutro = ingresso("bruno@email.com");
+        sessaoAdministrada.registrarIngresso(ingressoDeOutro);
+        when(repository.buscarPorId(sessaoAdministrada.getId())).thenReturn(Optional.of(sessaoAdministrada));
+
+        service.cancelar(sessaoAdministrada.getId(), ingressoDeOutro.getId(), "admin@email.com", true);
+
+        assertThat(ingressoDeOutro.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+        verify(repository).salvar(sessaoAdministrada);
+    }
 
 
 
