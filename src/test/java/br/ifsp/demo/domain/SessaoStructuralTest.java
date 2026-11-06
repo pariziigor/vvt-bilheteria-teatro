@@ -47,6 +47,31 @@ class SessaoStructuralTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    @Tag("Mutation")
+    void calculaDisponibilidadeConsiderandoSomenteIngressosVendidos() {
+        Sessao sessao = sessao(2, valor());
+        Ingresso vendido = ingresso(StatusIngresso.VENDIDO);
+        Ingresso cancelado = ingresso(StatusIngresso.CANCELADO);
+
+        assertThat(sessao.quantidadeIngressosVendidos()).isZero();
+        assertThat(sessao.quantidadeIngressosDisponiveis()).isEqualTo(2);
+        assertThat(sessao.estaLotada()).isFalse();
+
+        sessao.registrarIngresso(vendido);
+        sessao.registrarIngresso(cancelado);
+        Ingresso segundoVendido = ingresso(StatusIngresso.VENDIDO);
+        sessao.registrarIngresso(segundoVendido);
+
+        assertThat(sessao.getIngressos()).containsExactly(vendido, cancelado, segundoVendido);
+        assertThat(sessao.quantidadeIngressosVendidos()).isEqualTo(2);
+        assertThat(sessao.getQuantidadeIngressosVendidos()).isEqualTo(2);
+        assertThat(sessao.quantidadeIngressosDisponiveis()).isZero();
+        assertThat(sessao.getQuantidadeIngressosDisponiveis()).isZero();
+        assertThat(sessao.estaLotada()).isTrue();
+        assertThatThrownBy(() -> sessao.getIngressos().clear())
+                .isInstanceOf(UnsupportedOperationException.class);
+    }
 
 
 
