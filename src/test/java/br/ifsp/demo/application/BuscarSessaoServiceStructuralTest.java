@@ -54,6 +54,17 @@ class BuscarSessaoServiceStructuralTest {
         verify(repository).buscarPorId(id);
     }
 
+    @Test
+    @Tag("Mutation")
+    void informaQuandoSessaoNaoExiste() {
+        UUID id = UUID.randomUUID();
+        when(repository.buscarPorId(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.buscar(id))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Sessão não encontrada");
+        verify(repository).buscarPorId(id);
+    }
 
     private Sessao sessao(UUID id) {
         return new Sessao(id, UUID.randomUUID(),
