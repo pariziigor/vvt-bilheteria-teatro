@@ -53,6 +53,17 @@ class CancelarIngressoServiceStructuralTest {
         verifyNoInteractions(repository);
     }
 
+    @Test
+    @Tag("Mutation")
+    void informaQuandoSessaoNaoExiste() {
+        UUID sessaoId = UUID.randomUUID();
+        when(repository.buscarPorId(sessaoId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.cancelar(sessaoId, UUID.randomUUID(), "ana@email.com", false))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Sessão não encontrada");
+        verify(repository, never()).salvar(any());
+    }
 
 
 
