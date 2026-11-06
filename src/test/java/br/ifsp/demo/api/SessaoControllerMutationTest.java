@@ -118,6 +118,20 @@ class SessaoControllerMutationTest {
                 new DataHoraSessao(data, LocalTime.of(18, 0), LocalTime.of(20, 0)), 12, valor);
     }
 
+    @Test
+    @Tag("Mutation")
+    void rejeitaCorposAusentesAntesDeChamarOsServicos() {
+        UUID id = UUID.randomUUID();
+
+        assertThatThrownBy(() -> controller.criar(null, null))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> controller.atualizar(id, null, null))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> controller.comprarIngresso(id, null, null))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verifyNoInteractions(criarSessaoService, atualizarSessaoService, comprarIngressoService);
+    }
 
 
 
