@@ -738,7 +738,7 @@ O banco é SQLite, configurado em `src/main/resources/application.properties`. O
 
 ## Testes
 
-Os testes usam JUnit 5, Mockito e AssertJ. As tags são `UnitTest`, `TDD` e `Functional`.
+Os testes usam JUnit 5, Mockito e AssertJ. As tags são `UnitTest`, `TDD`, `Functional`, `Structural` e `Mutation`. Os testes estruturais e de mutação também possuem a tag `UnitTest`.
 
 ```powershell
 mvn clean test
@@ -748,3 +748,5 @@ mvn -Dtest=UnitTestSuite test
 ```
 
 Os testes cobrem criação, busca, atualização e remoção de sessões, compra e cancelamento de ingressos, descontos, capacidade, disponibilidade, sessões encerradas e entradas inválidas.
+
+Os resultados da Etapa 3 estão em [Structural.md](Structural.md) e [Mutation.md](Mutation.md). A relação entre cada teste novo de Igor e seu commit está em [docs/Etapa3-igor-commits.md](docs/Etapa3-igor-commits.md).

@@ -1,0 +1,6 @@
+PIT: 1.18.1 (use the matching pitest JAR)
+Class SHA-256: cf5bf775b7b2a65b04986692324e985eb6079bcee90f7a149984208a99d7de13
+Line: 44
+ID: MutationIdentifier [location=Location [clazz=br.ifsp.demo.domain.TipoIngresso, method=hashCode, methodDesc=()I], indexes=[11], mutator=org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator]
+Description: replaced int return with 0 for br/ifsp/demo/domain/TipoIngresso::hashCode
+No tests executed; historical mutation status is unchanged.

@@ -37,10 +37,23 @@ Na rodada complementar final, PIT gerou e matou 133 mutantes, sem sobreviventes 
 
 ## Mutantes equivalentes
 
-| Classe | Linha | ID do mutante PIT | Justificativa |
-| --- | ---: | --- | --- |
-| `TipoIngresso` | 44 | `org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator` — substituir o retorno inteiro por `0` | O mutante faz `hashCode()` retornar `0` para todas as instâncias. Isso causa colisões, mas respeita o contrato de Java: objetos iguais devem ter o mesmo hash; objetos diferentes não precisam ter hashes diferentes. |
+### `br.ifsp.demo.domain.TipoIngresso`
 
-O registro antigo preservou a classe, a linha e a descrição da mutação, mas não o ordinal numérico do relatório PIT. O identificador acima usa o mutador PIT e a localização da alteração, que identificam a mutação registrada.
+| Linha | ID do mutante PIT | Justificativa |
+| ---: | --- | --- |
+| 44 | `MutationIdentifier [location=Location [clazz=br.ifsp.demo.domain.TipoIngresso, method=hashCode, methodDesc=()I], indexes=[11], mutator=org.pitest.mutationtest.engine.gregor.mutators.returns.PrimitiveReturnsMutator]` | Substitui o retorno de `hashCode()` por `0`. Isso causa colisões, mas respeita o contrato de Java: objetos iguais devem ter o mesmo hash; objetos diferentes não precisam ter hashes diferentes. A categoria e as comparações por `equals` permanecem iguais. Não há requisito de distribuição específica dos hashes no domínio. |
+
+O ID completo foi recuperado em 06/11/2026 com a engine do PIT 1.18.1 sobre o bytecode compilado, selecionando apenas `hashCode()` e o mutador `PRIMITIVE_RETURNS`. O índice de instrução é **11** e o descritor do método é **`()I`**. A classe de produção não mudou desde o registro da rodada anterior. O relatório antigo não preservou seu ordinal visual; a tabela usa o `MutationIdentifier` da API do PIT, que identifica classe, método, assinatura, instrução e operador.
+
+Esta recuperação apenas inspecionou os metadados da mutação: não executou testes, não repetiu a rodada antiga e não alterou seus resultados. O estado equivalente continua baseado na análise documentada da rodada anterior. A saída integral e o SHA-256 do bytecode estão em [docs/evidence/tipo-ingresso-mutation-id.txt](docs/evidence/tipo-ingresso-mutation-id.txt).
+
+Para reproduzir a identificação, use Java 21 ou superior, após compilar o projeto com `./mvnw -DskipTests compile` (no Windows, `mvnw.cmd -DskipTests compile`). No PowerShell:
+
+```powershell
+$pitJar = "$env:USERPROFILE/.m2/repository/org/pitest/pitest/1.18.1/pitest-1.18.1.jar"
+java --class-path "$pitJar" scripts/IdentifyEquivalentMutation.java
+```
+
+O utilitário [scripts/IdentifyEquivalentMutation.java](scripts/IdentifyEquivalentMutation.java) exige exatamente uma mutação no método selecionado e imprime seu identificador, linha e descrição. O hash do bytecode pode variar com a versão do compilador.
 
 Todos os mutantes não equivalentes encontrados nas classes de sessões, ingressos, API e persistência foram cobertos por testes e mortos. O único mutante não morto é o equivalente de `TipoIngresso` descrito na tabela. Nenhum defeito de produção foi confirmado, portanto não foi aberta issue `bug`.
