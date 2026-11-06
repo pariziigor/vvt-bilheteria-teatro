@@ -43,6 +43,16 @@ class BuscarSessaoServiceStructuralTest {
         verifyNoInteractions(repository);
     }
 
+    @Test
+    @Tag("Mutation")
+    void retornaSessaoEncontrada() {
+        UUID id = UUID.randomUUID();
+        Sessao sessao = sessao(id);
+        when(repository.buscarPorId(id)).thenReturn(Optional.of(sessao));
+
+        assertThat(service.buscar(id)).isSameAs(sessao);
+        verify(repository).buscarPorId(id);
+    }
 
 
     private Sessao sessao(UUID id) {
