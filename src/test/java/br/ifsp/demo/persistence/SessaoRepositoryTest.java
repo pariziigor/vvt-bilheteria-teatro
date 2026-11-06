@@ -45,5 +45,28 @@ class SessaoRepositoryTest {
         assertThat(armazenada.get().getValorBaseIngresso()).isEqualByComparingTo("50.00");
     }
 
+    @Test
+    @Tag("UnitTest")
+    @Tag("Mutation")
+    @DisplayName("Deve carregar os ingressos associados ao buscar uma sessÃ£o")
+    void deveCarregarIngressosAssociadosAoBuscarSessao() {
+        DataHoraSessao dataHora = new DataHoraSessao(
+                LocalDate.now().plusDays(30), LocalTime.of(19, 0), LocalTime.of(21, 0));
+        Sessao sessao = new Sessao(UUID.randomUUID(), UUID.randomUUID(), dataHora, 100, new BigDecimal("50.00"));
+        Ingresso ingresso = new Ingresso(UUID.randomUUID(), new TipoIngresso("INTEIRA"),
+                new BigDecimal("50.00"), StatusIngresso.VENDIDO, "comprador@teste.com");
+        sessao.registrarIngresso(ingresso);
+
+        repository.salvar(sessao);
+
+        Optional<Sessao> armazenada = repository.buscarPorId(sessao.getId());
+        assertThat(armazenada).isPresent();
+        assertThat(armazenada.get().getIngressos()).singleElement().satisfies(carregado -> {
+            assertThat(carregado.getId()).isEqualTo(ingresso.getId());
+            assertThat(carregado.getStatus()).isEqualTo(ingresso.getStatus());
+            assertThat(carregado.getTipoIngresso()).isEqualTo(ingresso.getTipoIngresso());
+            assertThat(carregado.getCompradorEmail()).isEqualTo(ingresso.getCompradorEmail());
+        });
+    }
 
 }
