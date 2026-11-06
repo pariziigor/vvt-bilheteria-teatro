@@ -1,104 +1,314 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#17151d">
-  <meta name="description" content="Bilheteria do Teatro: descubra peças e acompanhe a programação.">
-  <title>Bilheteria do Teatro</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/styles.css">
-  <script src="/assets/app.js" defer></script>
-</head>
-<body>
-  <header class="topbar">
-    <a class="brand" href="#inicio" aria-label="Bilheteria do Teatro, início">
-      <span class="brand-mark" aria-hidden="true">✳</span>
-      <span>bilheteria<span class="brand-light">.teatro</span></span>
-    </a>
-    <nav class="topnav" aria-label="Navegação principal">
-      <a href="#programacao">Programação</a>
-      <button class="text-button" id="nav-auth" type="button">Entrar</button>
-      <button class="avatar-button hidden" id="nav-user" type="button" title="Sair" aria-label="Sair">S</button>
-    </nav>
-  </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#17151d" />
+    <meta
+      name="description"
+      content="Bilheteria do Teatro: descubra peças e acompanhe a programação."
+    />
+    <title>Bilheteria do Teatro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script src="/assets/app.js?v=5" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#inicio" aria-label="Bilheteria do Teatro, início">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span>bilheteria<span class="brand-light">.teatro</span></span>
+      </a>
+      <nav class="topnav" aria-label="Navegação principal">
+        <a href="#programacao">Programação</a>
+        <a href="#sessoes">Sessões</a>
+        <button class="text-button" id="nav-auth" type="button">Entrar</button>
+        <button
+          class="avatar-button hidden"
+          id="nav-user"
+          type="button"
+          title="Sair"
+          aria-label="Sair"
+        >
+          S
+        </button>
+      </nav>
+    </header>
 
-  <main id="inicio">
-    <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="eyebrow-line"></span> A cidade tem palco</p>
-        <h1>Uma boa história<br>muda a <em>noite.</em></h1>
-        <p class="hero-description">Encontre sua próxima peça favorita. O teatro está mais perto do que você imagina.</p>
-        <a class="button button-light" href="#programacao">Explorar programação <span aria-hidden="true">↓</span></a>
-      </div>
-      <div class="hero-art" aria-hidden="true">
-        <div class="curtain curtain-left"></div><div class="curtain curtain-right"></div>
-        <div class="spotlight"></div>
-        <div class="stage"><div class="stage-arch"><div class="stage-glow"></div><span class="stage-star">✳</span></div></div>
-        <div class="hero-note">O próximo ato<br>começa aqui.</div>
-      </div>
-      <div class="hero-index"><span>01</span><span class="index-rule"></span><span>03</span></div>
-    </section>
-
-    <section class="program-section" id="programacao">
-      <div class="section-heading">
-        <div><p class="eyebrow eyebrow-dark">No cartaz</p><h2>Peças em <em>cena</em></h2></div>
-        <p class="section-side-note">Histórias para sentir,<br>pensar e compartilhar.</p>
-      </div>
-
-      <div class="notice hidden" id="notice" role="status" aria-live="polite"></div>
-
-      <div class="auth-panel" id="auth-panel">
-        <div class="auth-intro">
-          <span class="auth-icon" aria-hidden="true">✳</span>
-          <div><h3>Entre para continuar</h3><p>Faça login para ver a programação e cadastrar peças.</p></div>
+    <main id="inicio">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-line"></span> A cidade tem palco</p>
+          <h1>Uma boa história<br />muda a <em>noite.</em></h1>
+          <p class="hero-description">
+            Encontre sua próxima peça favorita. O teatro está mais perto do que você imagina.
+          </p>
+          <a class="button button-light" href="#programacao"
+            >Explorar programação <span aria-hidden="true">↓</span></a
+          >
         </div>
-        <div class="auth-box">
-          <div class="auth-tabs" role="tablist" aria-label="Acesso à conta">
-            <button class="auth-tab active" id="login-tab" type="button" role="tab" aria-selected="true">Entrar</button>
-            <button class="auth-tab" id="register-tab" type="button" role="tab" aria-selected="false">Criar conta</button>
+        <div class="hero-art" aria-hidden="true">
+          <div class="curtain curtain-left"></div>
+          <div class="curtain curtain-right"></div>
+          <div class="spotlight"></div>
+          <div class="stage">
+            <div class="stage-arch">
+              <div class="stage-glow"></div>
+              <span class="stage-star">✳</span>
+            </div>
           </div>
-          <form id="auth-form">
-            <label class="field hidden" id="name-field">Seu nome<input name="nome" autocomplete="name" maxlength="120" placeholder="Como podemos te chamar?"></label>
-            <label class="field">E-mail<input name="email" type="email" autocomplete="email" required placeholder="voce@email.com"></label>
-            <label class="field">Senha<input name="senha" type="password" autocomplete="current-password" required placeholder="Sua senha"></label>
-            <button class="button button-dark button-full" id="auth-submit" type="submit">Entrar na bilheteria <span aria-hidden="true">↗</span></button>
-            <p class="form-message" id="auth-message" aria-live="polite"></p>
+          <div class="hero-note">O próximo ato<br />começa aqui.</div>
+        </div>
+        <div class="hero-index"><span>01</span><span class="index-rule"></span><span>03</span></div>
+      </section>
+
+      <section class="program-section" id="programacao">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow eyebrow-dark">No cartaz</p>
+            <h2>Peças em <em>cena</em></h2>
+          </div>
+          <p class="section-side-note">Histórias para sentir,<br />pensar e compartilhar.</p>
+        </div>
+
+        <div class="notice hidden" id="notice" role="status" aria-live="polite"></div>
+
+        <div class="catalog-toolbar hidden" id="catalog-toolbar">
+          <div>
+            <p class="eyebrow eyebrow-dark">Sua programação</p>
+            <p class="welcome" id="welcome-message">Bem-vinda à bilheteria.</p>
+          </div>
+          <button class="button button-outline" id="add-play-toggle" type="button">
+            ＋ Cadastrar peça
+          </button>
+        </div>
+
+        <form class="play-form hidden" id="play-form">
+          <div class="form-heading">
+            <div>
+              <p class="eyebrow eyebrow-dark">Novo espetáculo</p>
+              <h3>Coloque uma peça em cena</h3>
+            </div>
+            <button
+              class="icon-button"
+              id="close-play-form"
+              type="button"
+              aria-label="Fechar formulário"
+            >
+              ×
+            </button>
+          </div>
+          <div class="form-grid">
+            <label class="field"
+              >Título<input
+                name="titulo"
+                required
+                maxlength="160"
+                placeholder="Ex.: A vida é sonho"
+            /></label>
+            <label class="field"
+              >Classificação indicativa<input
+                name="classificacao"
+                required
+                maxlength="40"
+                placeholder="Livre, 12 anos..."
+            /></label>
+            <label class="field"
+              >Duração (minutos)<input
+                name="duracaoMinutos"
+                type="number"
+                required
+                min="1"
+                step="1"
+                placeholder="90"
+            /></label>
+            <label class="field field-wide"
+              >Sinopse<textarea
+                name="descricao"
+                required
+                maxlength="1000"
+                rows="3"
+                placeholder="Conte um pouco sobre a história..."
+              ></textarea>
+            </label>
+          </div>
+          <div class="form-actions">
+            <p class="form-message" id="play-message" aria-live="polite"></p>
+            <button class="button button-dark" type="submit">
+              Salvar peça <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="catalog-state" id="catalog-state">
+          <div class="empty-mark" aria-hidden="true">✳</div>
+          <p>Carregando a programação…</p>
+        </div>
+        <div class="play-grid hidden" id="play-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="sessions-section" id="sessoes">
+        <div class="program-section sessions-inner">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow eyebrow-dark">Agenda do teatro</p>
+              <h2>Sessões e <em>ingressos</em></h2>
+            </div>
+            <p class="section-side-note" id="sessions-description">
+              Escolha uma sessão, consulte a disponibilidade<br />e garanta seu lugar.
+            </p>
+          </div>
+
+          <div class="session-toolbar hidden" id="session-toolbar">
+            <p class="welcome" id="session-toolbar-copy">
+              Gerencie sessões, disponibilidade e vendas.
+            </p>
+            <button class="button button-outline" id="add-session-toggle" type="button">
+              ＋ Criar sessão
+            </button>
+          </div>
+
+          <form class="session-form hidden" id="session-form">
+            <div class="form-heading">
+              <div>
+                <p class="eyebrow eyebrow-dark" id="session-form-eyebrow">Nova sessão</p>
+                <h3 id="session-form-title">Coloque uma sessão na agenda</h3>
+              </div>
+              <button
+                class="icon-button"
+                id="close-session-form"
+                type="button"
+                aria-label="Fechar formulário"
+              >
+                ×
+              </button>
+            </div>
+            <input type="hidden" name="sessaoId" />
+            <div class="form-grid">
+              <label class="field"
+                >Peça<select name="pecaId" required>
+                  <option value="">Selecione uma peça</option>
+                </select></label
+              >
+              <label class="field">Data<input name="data" type="date" required /></label>
+              <label class="field"
+                >Horário de início<input name="horaInicio" type="time" required
+              /></label>
+              <label class="field"
+                >Horário de término<input name="horaFim" type="time" required
+              /></label>
+              <label class="field"
+                >Capacidade<input
+                  name="capacidade"
+                  type="number"
+                  min="1"
+                  step="1"
+                  required
+                  placeholder="Ex.: 120"
+              /></label>
+              <label class="field"
+                >Valor base do ingresso (R$)<input
+                  name="valorBaseIngresso"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  required
+                  placeholder="Ex.: 60,00"
+              /></label>
+            </div>
+            <div class="form-actions">
+              <p class="form-message" id="session-message" aria-live="polite"></p>
+              <button class="button button-dark" type="submit" id="session-submit">
+                Salvar sessão <span aria-hidden="true">↗</span>
+              </button>
+            </div>
           </form>
+
+          <div class="notice hidden" id="session-notice" role="status" aria-live="polite"></div>
+          <div class="catalog-state" id="session-state">
+            <div class="empty-mark" aria-hidden="true">✳</div>
+            <p>Carregando sessões…</p>
+          </div>
+          <div class="session-grid hidden" id="session-grid" aria-live="polite"></div>
         </div>
-      </div>
+      </section>
 
-      <div class="catalog-toolbar hidden" id="catalog-toolbar">
-        <div><p class="eyebrow eyebrow-dark">Sua programação</p><p class="welcome" id="welcome-message">Bem-vinda à bilheteria.</p></div>
-        <button class="button button-outline" id="add-play-toggle" type="button">＋ Cadastrar peça</button>
-      </div>
-
-      <form class="play-form hidden" id="play-form">
-        <div class="form-heading"><div><p class="eyebrow eyebrow-dark">Novo espetáculo</p><h3>Coloque uma peça em cena</h3></div><button class="icon-button" id="close-play-form" type="button" aria-label="Fechar formulário">×</button></div>
-        <div class="form-grid">
-          <label class="field">Título<input name="titulo" required maxlength="160" placeholder="Ex.: A vida é sonho"></label>
-          <label class="field">Classificação indicativa<input name="classificacao" required maxlength="40" placeholder="Livre, 12 anos..."></label>
-          <label class="field">Duração (minutos)<input name="duracaoMinutos" type="number" required min="1" step="1" placeholder="90"></label>
-          <label class="field field-wide">Sinopse<textarea name="descricao" required maxlength="1000" rows="3" placeholder="Conte um pouco sobre a história..."></textarea></label>
+      <section class="program-section access-section" id="acesso">
+        <div class="auth-panel" id="auth-panel">
+          <div class="auth-intro">
+            <span class="auth-icon" aria-hidden="true">✳</span>
+            <div>
+              <h3>Acesse a bilheteria</h3>
+              <p>Entre para comprar ingressos ou gerenciar a programação.</p>
+            </div>
+          </div>
+          <div class="auth-box">
+            <div class="auth-tabs" role="tablist" aria-label="Acesso à conta">
+              <button
+                class="auth-tab active"
+                id="login-tab"
+                type="button"
+                role="tab"
+                aria-selected="true"
+              >
+                Entrar
+              </button>
+              <button
+                class="auth-tab"
+                id="register-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+              >
+                Criar conta
+              </button>
+            </div>
+            <form id="auth-form">
+              <label class="field hidden" id="name-field"
+                >Seu nome<input
+                  name="nome"
+                  autocomplete="name"
+                  maxlength="120"
+                  placeholder="Como podemos te chamar?"
+              /></label>
+              <label class="field"
+                >E-mail<input
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  placeholder="voce@email.com"
+              /></label>
+              <label class="field"
+                >Senha<input
+                  name="senha"
+                  type="password"
+                  autocomplete="current-password"
+                  required
+                  placeholder="Sua senha"
+              /></label>
+              <button class="button button-dark button-full" id="auth-submit" type="submit">
+                Entrar na bilheteria <span aria-hidden="true">↗</span>
+              </button>
+              <p class="form-message" id="auth-message" aria-live="polite"></p>
+            </form>
+          </div>
         </div>
-        <div class="form-actions"><p class="form-message" id="play-message" aria-live="polite"></p><button class="button button-dark" type="submit">Salvar peça <span aria-hidden="true">↗</span></button></div>
-      </form>
+      </section>
 
-      <div class="catalog-state" id="catalog-state">
-        <div class="empty-mark" aria-hidden="true">✳</div>
-        <p>Faça login para descobrir as peças disponíveis.</p>
-      </div>
-      <div class="play-grid hidden" id="play-grid" aria-live="polite"></div>
-    </section>
-
-    <section class="closing-note">
-      <span class="closing-star" aria-hidden="true">✳</span>
-      <p>As luzes se apagam.<br><em>A história começa.</em></p>
-      <a href="#programacao" aria-label="Voltar para a programação">↑</a>
-    </section>
-  </main>
-  <footer class="footer"><span>© Bilheteria do Teatro</span><span>Feito para quem ama uma boa história.</span></footer>
-</body>
+      <section class="closing-note">
+        <span class="closing-star" aria-hidden="true">✳</span>
+        <p>As luzes se apagam.<br /><em>A história começa.</em></p>
+        <a href="#programacao" aria-label="Voltar para a programação">↑</a>
+      </section>
+    </main>
+    <footer class="footer">
+      <span>© Bilheteria do Teatro</span><span>Feito para quem ama uma boa história.</span>
+    </footer>
+  </body>
 </html>
