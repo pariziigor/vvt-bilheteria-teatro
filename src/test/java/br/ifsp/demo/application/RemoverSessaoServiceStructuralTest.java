@@ -58,6 +58,20 @@ class RemoverSessaoServiceStructuralTest {
         verify(repository, never()).remover(any());
     }
 
+    @Test
+    @Tag("Mutation")
+    void removeSessaoSemIngressosVendidosIncluindoApenasCancelados() {
+        Sessao semIngressos = sessao();
+        when(repository.buscarPorId(semIngressos.getId())).thenReturn(Optional.of(semIngressos));
+        service.remover(semIngressos.getId());
+        verify(repository).remover(semIngressos.getId());
+
+        Sessao soComIngressoCancelado = sessao();
+        soComIngressoCancelado.registrarIngresso(ingresso(StatusIngresso.CANCELADO));
+        when(repository.buscarPorId(soComIngressoCancelado.getId())).thenReturn(Optional.of(soComIngressoCancelado));
+        service.remover(soComIngressoCancelado.getId());
+        verify(repository).remover(soComIngressoCancelado.getId());
+    }
 
 
     private Sessao sessao() {
