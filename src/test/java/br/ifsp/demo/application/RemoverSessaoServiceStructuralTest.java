@@ -46,6 +46,17 @@ class RemoverSessaoServiceStructuralTest {
         verifyNoInteractions(repository);
     }
 
+    @Test
+    @Tag("Mutation")
+    void informaQuandoSessaoNaoExiste() {
+        UUID id = UUID.randomUUID();
+        when(repository.buscarPorId(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.remover(id))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Sessão não encontrada");
+        verify(repository, never()).remover(any());
+    }
 
 
 
