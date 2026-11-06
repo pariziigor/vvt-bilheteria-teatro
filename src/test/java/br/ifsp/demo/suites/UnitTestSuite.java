@@ -5,7 +5,7 @@ import org.junit.platform.suite.api.SelectPackages;
 import org.junit.platform.suite.api.Suite;
 
 @Suite
-@SelectPackages({"br.ifsp.demo.application", "br.ifsp.demo.domain", "br.ifsp.demo.security"})
+@SelectPackages("br.ifsp.demo")
 @IncludeTags("UnitTest")
 class UnitTestSuite {
 }
