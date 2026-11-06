@@ -90,6 +90,35 @@ class SessaoStructuralTest {
         assertThat(sessao.getValorBaseIngresso()).isEqualByComparingTo(novoValor);
     }
 
+    @Test
+    @Tag("Mutation")
+    void rejeitaAtualizacaoQueViolaValidacoesDeCapacidadeDadosEData() {
+        Sessao sessao = sessao(2, valor());
+        sessao.registrarIngresso(ingresso(StatusIngresso.VENDIDO));
+        sessao.registrarIngresso(ingresso(StatusIngresso.VENDIDO));
+        UUID pecaId = UUID.randomUUID();
+        DataHoraSessao dataHora = dataHoraFutura();
+
+        assertThatThrownBy(() -> sessao.atualizar(pecaId, dataHora, 0, valor()))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao.atualizar(pecaId, dataHora, 1, valor()))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao.atualizar(null, dataHora, 2, valor()))
+                .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> sessao.atualizar(pecaId, null, 2, valor()))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao.atualizar(pecaId, dataHora, 2, null))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao.atualizar(pecaId, dataHora, 2, BigDecimal.ZERO))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> sessao.atualizar(pecaId, dataHora, 2, new BigDecimal("-1")))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        DataHoraSessao passada = new DataHoraSessao(
+                LocalDate.now().minusDays(1), LocalTime.of(19, 0), LocalTime.of(21, 0));
+        assertThatThrownBy(() -> sessao.atualizar(pecaId, passada, 2, valor()))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 
 
 
