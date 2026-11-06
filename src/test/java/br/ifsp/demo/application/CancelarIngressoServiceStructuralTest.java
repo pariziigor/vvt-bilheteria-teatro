@@ -104,6 +104,23 @@ class CancelarIngressoServiceStructuralTest {
         verify(repository).salvar(sessaoAdministrada);
     }
 
+    @Test
+    @Tag("Mutation")
+    void informaQuandoIngressoNaoPertenceASessaoEUsaSobrecargaAdministrativa() {
+        Sessao sessao = sessao(LocalDate.now().plusDays(30));
+        when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        assertThatThrownBy(() -> service.cancelar(sessao.getId(), UUID.randomUUID(), "ana@email.com", false))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("Ingresso não encontrado na sessão");
+        verify(repository, never()).salvar(any());
+
+        Ingresso ingresso = ingresso("bruno@email.com");
+        sessao.registrarIngresso(ingresso);
+        service.cancelar(sessao.getId(), ingresso.getId());
+        assertThat(ingresso.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+        verify(repository).salvar(sessao);
+    }
 
 
     private Sessao sessao(LocalDate data) {
