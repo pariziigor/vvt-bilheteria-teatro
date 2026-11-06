@@ -1,6 +1,7 @@
 package br.ifsp.demo.application;
 
 import br.ifsp.demo.domain.IUsuarioRepository;
+import br.ifsp.demo.domain.PapelUsuario;
 import br.ifsp.demo.domain.Usuario;
 import br.ifsp.demo.security.JwtService;
 import org.junit.jupiter.api.DisplayName;
@@ -42,11 +43,12 @@ class AutenticarUsuarioServiceStructuralTest {
     void autenticaComCredenciaisValidas() {
         Usuario usuario = usuarioCadastrado();
         when(passwordEncoder.matches("segredo123", "senha-codificada")).thenReturn(true);
-        when(jwtService.gerarToken("ana@email.com")).thenReturn("token-jwt");
+        when(jwtService.gerarToken("ana@email.com", PapelUsuario.CLIENTE)).thenReturn("token-jwt");
 
         String token = service.autenticar("ana@email.com", "segredo123");
 
         assertThat(token).isEqualTo("token-jwt");
+        verify(jwtService).gerarToken("ana@email.com", PapelUsuario.CLIENTE);
     }
 
     @Test
