@@ -106,6 +106,23 @@ class CancelarIngressoServiceStructuralTest {
 
     @Test
     @Tag("Mutation")
+    void cancelaIngressoSolicitadoQuandoSessaoPossuiOutrosIngressos() {
+        Sessao sessao = sessao(LocalDate.now().plusDays(30));
+        Ingresso ingressoDeOutro = ingresso("bruno@email.com");
+        Ingresso ingressoDoCliente = ingresso("ana@email.com");
+        sessao.registrarIngresso(ingressoDeOutro);
+        sessao.registrarIngresso(ingressoDoCliente);
+        when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        service.cancelar(sessao.getId(), ingressoDoCliente.getId(), "ana@email.com", false);
+
+        assertThat(ingressoDeOutro.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+        assertThat(ingressoDoCliente.getStatus()).isEqualTo(StatusIngresso.CANCELADO);
+        verify(repository).salvar(sessao);
+    }
+
+    @Test
+    @Tag("Mutation")
     void informaQuandoIngressoNaoPertenceASessaoEUsaSobrecargaAdministrativa() {
         Sessao sessao = sessao(LocalDate.now().plusDays(30));
         when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));

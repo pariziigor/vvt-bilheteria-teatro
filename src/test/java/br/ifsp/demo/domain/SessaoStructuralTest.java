@@ -56,6 +56,7 @@ class SessaoStructuralTest {
 
         assertThat(sessao.quantidadeIngressosVendidos()).isZero();
         assertThat(sessao.quantidadeIngressosDisponiveis()).isEqualTo(2);
+        assertThat(sessao.getQuantidadeIngressosDisponiveis()).isEqualTo(2);
         assertThat(sessao.estaLotada()).isFalse();
 
         sessao.registrarIngresso(vendido);
