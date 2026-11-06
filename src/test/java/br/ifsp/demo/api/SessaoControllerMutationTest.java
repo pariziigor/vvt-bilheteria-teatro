@@ -133,6 +133,29 @@ class SessaoControllerMutationTest {
         verifyNoInteractions(criarSessaoService, atualizarSessaoService, comprarIngressoService);
     }
 
+    @Test
+    @Tag("Mutation")
+    void delegaCompraCancelamentoERemocaoEConverteIngressoEmResposta() {
+        UUID sessaoId = UUID.randomUUID();
+        UUID ingressoId = UUID.randomUUID();
+        Authentication cliente = authentication("ana@teste.com", "ROLE_CLIENTE");
+        Ingresso ingresso = new Ingresso(ingressoId, new TipoIngresso("ESTUDANTE"),
+                new BigDecimal("25.00"), StatusIngresso.VENDIDO, "ana@teste.com");
+        when(comprarIngressoService.comprar(sessaoId, "ESTUDANTE", "ana@teste.com")).thenReturn(ingresso);
+
+        var compra = controller.comprarIngresso(sessaoId, new ComprarIngressoRequest("ESTUDANTE"), cliente);
+
+        assertThat(compra.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(compra.getBody()).isEqualTo(new IngressoResponse(
+                ingressoId, "ESTUDANTE", new BigDecimal("25.00"), StatusIngresso.VENDIDO));
+
+        assertThat(controller.cancelarIngresso(sessaoId, ingressoId, cliente).getStatusCode())
+                .isEqualTo(HttpStatus.NO_CONTENT);
+        verify(cancelarIngressoService).cancelar(sessaoId, ingressoId, "ana@teste.com", false);
+
+        assertThat(controller.remover(sessaoId).getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        verify(removerSessaoService).remover(sessaoId);
+    }
 
 
     private Authentication authentication(String email, String role) {
