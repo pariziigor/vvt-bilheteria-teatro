@@ -73,6 +73,21 @@ class ComprarIngressoServiceStructuralTest {
         verify(repository, never()).salvar(any());
     }
 
+    @Test
+    @Tag("Mutation")
+    void compraIngressoDoCompradorERegistraOValorEDesconto() {
+        Sessao sessao = sessao(LocalDate.now().plusDays(2), 2);
+        when(repository.buscarPorId(sessao.getId())).thenReturn(Optional.of(sessao));
+
+        Ingresso ingresso = service.comprar(sessao.getId(), "ESTUDANTE", "ana@email.com");
+
+        assertThat(ingresso.getTipoIngresso()).isEqualTo(new TipoIngresso("ESTUDANTE"));
+        assertThat(ingresso.getValor()).isEqualByComparingTo("25.00");
+        assertThat(ingresso.getStatus()).isEqualTo(StatusIngresso.VENDIDO);
+        assertThat(ingresso.getCompradorEmail()).isEqualTo("ana@email.com");
+        assertThat(sessao.getIngressos()).containsExactly(ingresso);
+        verify(repository).salvar(sessao);
+    }
 
 
     private Sessao sessao(LocalDate data, int capacidade) {
