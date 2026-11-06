@@ -73,6 +73,22 @@ class SessaoStructuralTest {
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
+    @Test
+    @Tag("Mutation")
+    void atualizaSessaoQuandoNovaCapacidadeNaoFicaAbaixoDasVendas() {
+        Sessao sessao = sessao(2, valor());
+        sessao.registrarIngresso(ingresso(StatusIngresso.VENDIDO));
+        UUID novaPecaId = UUID.randomUUID();
+        DataHoraSessao novaDataHora = dataHoraFutura();
+        BigDecimal novoValor = new BigDecimal("72.50");
+
+        sessao.atualizar(novaPecaId, novaDataHora, 1, novoValor);
+
+        assertThat(sessao.getPecaId()).isEqualTo(novaPecaId);
+        assertThat(sessao.getDataHora()).isEqualTo(novaDataHora);
+        assertThat(sessao.getCapacidade()).isEqualTo(1);
+        assertThat(sessao.getValorBaseIngresso()).isEqualByComparingTo(novoValor);
+    }
 
 
 
